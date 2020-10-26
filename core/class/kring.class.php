@@ -21,8 +21,18 @@
  require_once(__DIR__  . '/../../../../core/php/core.inc.php');
  require_once(__DIR__  . '/../php/kring.inc.php');
 
+ define('KRING_LIB_PATH',__DIR__.'/../../3rparty/KKPA/autoload.php');
+ define('KRCPA_MIN_VERSION','0.1');
+
  /*error_reporting(-1);
  ini_set('display_errors', 'On');*/
+
+ if (!class_exists('KRCPA\Clients\krcpaClient')) {
+ 	if (file_exists(TEST_FILE))
+ 	{
+ 		require_once(KRING_LIB_PATH);
+ 	}
+ }
 
  class kring extends eqLogic {
    /*     * *************************Attributs****************************** */
@@ -30,6 +40,37 @@
 
    /*     * ***********************Methode static*************************** */
 
+    public static function dependancy_info()
+    {
+    	  log::add(__CLASS__ . '_update','debug','Checking dependancy');
+    		$return = array();
+    		$return['log'] = 'kring_update';
+    		$return['progress_file'] =  jeedom::getTmpFolder('kring') . '/dependancy_kring_in_progress';
+        if (class_exists('KRCPA\Clients\krcpaClient'))
+        {
+          try
+          {
+            if (version_compare(KRCPA\Clients\krcpaClient::getVersion(),KRCPA_MIN_VERSION,'<'))
+            {
+              log::add(__CLASS__,'error',
+              __('Nouvelle version des dépendance requise. Merci de réinstaller les dépendances de kring',__FILE__)
+  						);
+              $return['state'] = 'nok';
+            } else {
+              $return['state'] = 'ok';
+            }
+  				}
+  				catch (Exception $e)
+  				{
+  		   		$return['state'] = 'nok';
+  				}
+        } else
+        {
+          $return['state'] = 'nok';
+        }
+        log::add(__CLASS__,'debug','Dependancy_info: '.print_r($return,true));
+     		return $return;
+    }
 
    /*     * *********************Methode d'instance************************* */
 
