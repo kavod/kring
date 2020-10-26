@@ -1,0 +1,16 @@
+{
+	"id" : "kring",
+	"name" : "Kring",
+	"description" : "Plugin Ring.Com",
+	"licence" : "AGPL",
+	"author" : "kavod",
+	"require" : "3.3",
+	"category" : "security",
+	"hasDependency" : true,
+	"hasOwnDeamon" : true,
+	"maxDependancyInstallTime" : 1,
+	"changelog" : "https://kavod.github.io/kring/#language#/changelog",
+	"documentation" : "https://kavod.github.io/kring/#language#/",
+	"language" : ["fr_FR","en_US"],
+	"compatibility" : ["miniplus","smart","rpi","diy","mobile","v4"]
+}
