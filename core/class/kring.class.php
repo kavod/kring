@@ -21,14 +21,14 @@
  require_once(__DIR__  . '/../../../../core/php/core.inc.php');
  require_once(__DIR__  . '/../php/kring.inc.php');
 
- define('KRING_LIB_PATH',__DIR__.'/../../3rparty/KKPA/autoload.php');
+ define('KRING_LIB_PATH',__DIR__.'/../../3rdparty/krcpa/autoload.php');
  define('KRCPA_MIN_VERSION','0.1');
 
- /*error_reporting(-1);
- ini_set('display_errors', 'On');*/
+ error_reporting(-1);
+ ini_set('display_errors', 'On');
 
  if (!class_exists('KRCPA\Clients\krcpaClient')) {
- 	if (file_exists(TEST_FILE))
+ 	if (file_exists(KRING_LIB_PATH))
  	{
  		require_once(KRING_LIB_PATH);
  	}
