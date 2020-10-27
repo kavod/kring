@@ -39,6 +39,7 @@
    private static $_client = null;
 
    /*     * ***********************Methode static*************************** */
+   /*     * ----------------------- Dependances ---------------------------- */
 
     public static function dependancy_info()
     {
@@ -81,6 +82,62 @@
 				'log' => log::getPathToLog(__CLASS__ . '_update')
 			);
   	}
+
+    /*     * -----------------------   Deamon   ---------------------------- */
+    public static function deamon_info()
+    {
+  		$return = array();
+  		$return['state'] = 'nok';
+  		$pid_file = jeedom::getTmpFolder(__CLASS__) . '/deamon.pid';
+  		if (file_exists($pid_file)) {
+  			if (posix_getsid(trim(file_get_contents($pid_file)))) {
+  				$return['state'] = 'ok';
+  			} else {
+  				shell_exec(system::getCmdSudo() . 'rm -rf ' . $pid_file . ' 2>&1 > /dev/null');
+  			}
+  		}
+      $return['launchable'] = 'nok';
+      // $refresh_token = config::byKey('refresh_token', __CLASS__);
+      // if ($refresh_token == '')
+      // {
+      //   $return['launchable'] = 'nok';
+			// 	$return['launchable_message'] = __('Le port n\'est pas configuré', __FILE__);
+      // }
+      return $return;
+    }
+
+    public static function deamon_start($_debug = false) {
+
+    }
+
+    public static function deamon_stop() {
+
+    }
+    /*     * -----------------------   Others   ---------------------------- */
+    public static function getClient()
+    {
+      if (self::$_client == null)
+      {
+        $conf = array(
+          "username" => config::byKey('username', __CLASS__),
+          "password" => config::byKey('password', __CLASS__)
+        );
+        self::$_client = new KRCPA\Clients\krcpaClient($conf);
+      }
+      return self::$_client;
+    }
+
+    public static function askCode() {
+      self::getClient();
+      return self::$_client->auth_password();
+    }
+
+    public static function authCode($code)
+    {
+      self::getClient();
+      self::$_client->setVariable('auth_code',$code);
+      return self::$_client->auth_password();
+    }
 
    /*     * *********************Methode d'instance************************* */
 

@@ -28,8 +28,18 @@
 
      ajax::init();
 
-   	if (init('action') == 'niouf') {
-      ajax::success('niorf');
+   	if (init('action') == 'askCode') {
+      $result = kring::askCode();
+      if (array_key_exists('error',$result))
+      {
+        ajax::error(__("Erreur d'authentification",__FILE__));
+      }
+      ajax::success($result['phone']);
+    } elseif (init('action') == 'authCode')
+    {
+      $result = king::authCode();
+      config::save('refresh_token',$result['refresh_token'],__CLASS__);
+      ajax::success();
     }
     throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
     /*     * *********Catch exeption*************** */

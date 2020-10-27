@@ -15,6 +15,88 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+ $('#bt_savePluginConfig1').click(function() {
+    $('#bt_savePluginConfig').click();
+ });
+
+ $('#bt_askCode').on('click', function () {
+     $.ajax({// fonction permettant de faire de l'ajax
+         type: "POST", // methode de transmission des données au fichier php
+         url: "plugins/kring/core/ajax/kring.ajax.php", // url du fichier php
+         data: {
+             action: "askCode",
+         },
+         dataType: 'json',
+         error: function (request, status, error) {
+             handleAjaxError(request, status, error);
+         },
+         success: function (data) { // si l'appel a bien fonctionné
+             if (data.state != 'ok') {
+                 $('#div_alert').showAlert({message: data.result, level: 'danger'});
+                 return;
+             }
+             //data.result
+             var cmdType = $(this).attr("dataCmdType");
+             var dialog_title = '{{Code de vérification}}';
+             var dialog_message = '<form class="form-horizontal onsubmit="return false;"> ';
+             dialog_title = '{{Code de vérification}}';
+             dialog_message += '<label class="control-label" > {{Un code de vérification a été envoyé au numéro suivant : ' + data.result + '}} </label> ' +
+             '<div> ' +
+             '<input type="text" name="verif_code" id="verif_code" value="" /> ' +
+             '</div> ';
+             dialog_message += '</form>';
+             bootbox.dialog({
+               title: dialog_title,
+               message: dialog_message,
+               buttons: {
+                 "{{Annuler}}": {
+                   className: "btn-danger",
+                   callback: function () {}
+                 },
+                 success: {
+                   label: "Démarrer",
+                   className: "btn-success",
+                   callback: function () {
+                     verif_code = $("input[name='verif_code']").val();
+                     kringAuth(verif_code);
+                   }
+                 }
+               },
+             });
+             // $('#div_alert').showAlert({message: "{{Synchronisation réussie}}. "+data.result.toString()+" {{équipement(s) trouvé(s)}}. {{Merci de raffraichir la page}}", level: 'success'});
+             // var vars = getUrlVars();
+             // var url = 'index.php?';
+             // for (var i in vars) {
+             //   if (i != 'id' && i != 'saveSuccessFull' && i != 'removeSuccessFull') {
+             //     url += i + '=' + vars[i].replace('#', '') + '&';
+             //   }
+             // }
+             // url += 'syncedDevices=' + data.result.toString();
+             // loadPage(url);
+         }
+     });
+ });
+
+ function kringAuth(verif_code) {
+   $.ajax({// fonction permettant de faire de l'ajax
+       type: "POST", // methode de transmission des données au fichier php
+       url: "plugins/kring/core/ajax/kring.ajax.php", // url du fichier php
+       data: {
+           action: "authCode",
+           verif_code: verif_code
+       },
+       dataType: 'json',
+       error: function (request, status, error) {
+           handleAjaxError(request, status, error);
+       },
+       success: function (data) { // si l'appel a bien fonctionné
+           if (data.state != 'ok') {
+               $('#div_alert').showAlert({message: data.result, level: 'danger'});
+               return;
+           }
+         }
+       });
+ }
 
  function addCmdToTable(_cmd) {
      if (!isset(_cmd)) {

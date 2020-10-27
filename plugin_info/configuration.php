@@ -25,19 +25,29 @@
      die();
  }
  ?>
+ <h4>{{Etape 1 : Saisir vos identifiants Ring.Com}}</h1>
  <form class="form-horizontal">
    <fieldset>
-     <div class="form-group kkasa-only-cloud">
-         <label class="col-lg-4 control-label">{{Nom d'utilisateur Ring.com (email)}}</label>
-         <div class="col-lg-2">
-             <input class="configKey form-control" data-l1key="username" />
-         </div>
-     </div>
-     <div class="form-group kkasa-only-cloud">
-         <label class="col-lg-4 control-label">{{Mot de passe Ring.com}}</label>
-         <div class="col-lg-2">
-             <input type="password" class="configKey form-control" data-l1key="password" />
-         </div>
-     </div>
+       <label class="col-lg-4 control-label">{{Nom d'utilisateur Ring.com (email)}}</label>
+       <div class="col-lg-2">
+           <input class="configKey form-control" data-l1key="username" />
+       </div>
+       <label class="col-lg-4 control-label">{{Mot de passe Ring.com}}</label>
+       <div class="col-lg-2">
+           <input type="password" class="configKey form-control" data-l1key="password" />
+       </div>
  </fieldset>
 </form>
+<h4>{{Etape 2 : Sauvegarder}}</h1>
+<div>
+ <a class="btn btn-success btn-xs" id="bt_savePluginConfig1">
+   <i class="far fa-check-circle icon-white"></i>{{ Sauvegarder}}
+ </a>
+</div>
+<h4>{{Etape 3 : Demander un code de confirmation}}</h1>
+<div>
+ <a class="btn btn-success btn-xs" id="bt_askCode">
+   <i class="far fa-comment-alt icon-white"></i>{{ Demander code}}
+ </a>
+</div>
+<?php include_file('desktop', 'kring', 'js', 'kring');?>
