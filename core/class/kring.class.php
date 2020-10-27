@@ -72,6 +72,16 @@
      		return $return;
     }
 
+    public static function dependancy_install()
+    {
+  		log::remove(__CLASS__ . '_update');
+      $path_3rd_party = __DIR__.'/../../3rdparty/';
+  		return array(
+				'script' => __DIR__ . '/../../resources/install.sh ' . $path_3rd_party . ' ' . jeedom::getTmpFolder('kring'),
+				'log' => log::getPathToLog(__CLASS__ . '_update')
+			);
+  	}
+
    /*     * *********************Methode d'instance************************* */
 
 
