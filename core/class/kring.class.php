@@ -127,7 +127,9 @@
       return self::$_client;
     }
 
-    public static function askCode() {
+    public static function askCode($username='',$password='') {
+      config::save('username',$username,__CLASS__);
+      config::save('password',$password,__CLASS__);
       self::getClient();
       return self::$_client->auth_password();
     }
@@ -136,7 +138,14 @@
     {
       self::getClient();
       self::$_client->setVariable('auth_code',$code);
-      return self::$_client->auth_password();
+      $result = self::$_client->auth_password();
+      if (array_key_exists("refresh_token",$result))
+      {
+        config::save('refresh_token',$result['refresh_token'],__CLASS__);
+        config::remove('username',__CLASS__);
+        config::remove('password',__CLASS__);
+      }
+      return $result;
     }
 
    /*     * *********************Methode d'instance************************* */

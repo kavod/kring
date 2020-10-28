@@ -26,7 +26,7 @@
  }
  ?>
  <h4>{{Etape 1 : Saisir vos identifiants Ring.Com}}</h1>
- <form class="form-horizontal">
+ <!--<form class="form-horizontal">
    <fieldset>
        <label class="col-lg-4 control-label">{{Nom d'utilisateur Ring.com (email)}}</label>
        <div class="col-lg-2">
@@ -37,7 +37,7 @@
            <input type="password" class="configKey form-control" data-l1key="password" />
        </div>
  </fieldset>
-</form>
+</form>-->
 <h4>{{Etape 2 : Sauvegarder}}</h1>
 <div>
  <a class="btn btn-success btn-xs" id="bt_savePluginConfig1">
@@ -46,7 +46,7 @@
 </div>
 <h4>{{Etape 3 : Demander un code de confirmation}}</h1>
 <div>
- <a class="btn btn-success btn-xs" id="bt_askCode">
+ <a class="btn btn-success btn-xs" id="bt_sendPassword">
    <i class="far fa-comment-alt icon-white"></i>{{ Demander code}}
  </a>
 </div>

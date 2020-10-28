@@ -19,12 +19,51 @@
     $('#bt_savePluginConfig').click();
  });
 
- $('#bt_askCode').on('click', function () {
+ $('#bt_sendPassword').on('click', function () {
+   var cmdType = $(this).attr("dataCmdType");
+   var dialog_title = '{{Code de vérification}}';
+   var dialog_message = '';
+   dialog_message  = '<form class="form-horizontal" onsubmit="return false;">';
+   dialog_message += '  <fieldset>';
+   dialog_message += '    <label class="col-lg-4 control-label">{{Nom d\'utilisateur Ring.com (email)}}</label>';
+   dialog_message += '    <div class="col-lg-2">';
+   dialog_message += '      <input class="configKey form-control" name="username" />';
+   dialog_message += '    </div>';
+   dialog_message += '    <label class="col-lg-4 control-label">{{Mot de passe Ring.com}}</label>';
+   dialog_message += '    <div class="col-lg-2">';
+   dialog_message += '      <input type="password" class="configKey form-control" name="password" />';
+   dialog_message += '    </div>';
+   dialog_message += '  </fieldset>';
+   dialog_message += '</form>';
+   bootbox.dialog({
+     title: dialog_title,
+     message: dialog_message,
+     buttons: {
+       "{{Annuler}}": {
+         className: "btn-danger",
+         callback: function () {}
+       },
+       success: {
+         label: "Démarrer",
+         className: "btn-success",
+         callback: function () {
+           username = $("input[name='username']").val();
+           password = $("input[name='password']").val();
+           askCode(username,password);
+         }
+       }
+     },
+   });
+ });
+
+function askCode(username,password) {
      $.ajax({// fonction permettant de faire de l'ajax
          type: "POST", // methode de transmission des données au fichier php
          url: "plugins/kring/core/ajax/kring.ajax.php", // url du fichier php
          data: {
              action: "askCode",
+             username: username,
+             password: password
          },
          dataType: 'json',
          error: function (request, status, error) {
@@ -39,7 +78,6 @@
              var cmdType = $(this).attr("dataCmdType");
              var dialog_title = '{{Code de vérification}}';
              var dialog_message = '<form class="form-horizontal onsubmit="return false;"> ';
-             dialog_title = '{{Code de vérification}}';
              dialog_message += '<label class="control-label" > {{Un code de vérification a été envoyé au numéro suivant : ' + data.result + '}} </label> ' +
              '<div> ' +
              '<input type="text" name="verif_code" id="verif_code" value="" /> ' +
@@ -75,7 +113,7 @@
              // loadPage(url);
          }
      });
- });
+ };
 
  function kringAuth(verif_code) {
    $.ajax({// fonction permettant de faire de l'ajax

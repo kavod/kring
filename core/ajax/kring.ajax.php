@@ -29,7 +29,7 @@
      ajax::init();
 
    	if (init('action') == 'askCode') {
-      $result = kring::askCode();
+      $result = kring::askCode(init('username'),init('password'));
       if (array_key_exists('error',$result))
       {
         ajax::error(__("Erreur d'authentification",__FILE__));
@@ -38,7 +38,7 @@
     } elseif (init('action') == 'authCode')
     {
       $result = kring::authCode(init('verif_code'));
-      $rcode = config::save('refresh_token',$result['refresh_token'],__CLASS__);
+      //$rcode = config::save('refresh_token',$result['refresh_token'],'kring');
       ajax::success($result);
     }
     throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
