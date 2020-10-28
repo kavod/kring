@@ -37,9 +37,9 @@
       ajax::success($result['phone']);
     } elseif (init('action') == 'authCode')
     {
-      $result = king::authCode();
-      config::save('refresh_token',$result['refresh_token'],__CLASS__);
-      ajax::success();
+      $result = kring::authCode(init('verif_code'));
+      $rcode = config::save('refresh_token',$result['refresh_token'],__CLASS__);
+      ajax::success($result);
     }
     throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
     /*     * *********Catch exeption*************** */
