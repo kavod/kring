@@ -88,6 +88,7 @@
     {
   		$return = array();
   		$return['state'] = 'nok';
+      $return['launchable'] = 'nok';
   		$pid_file = jeedom::getTmpFolder(__CLASS__) . '/deamon.pid';
   		if (file_exists($pid_file)) {
   			if (posix_getsid(trim(file_get_contents($pid_file)))) {
@@ -96,13 +97,14 @@
   				shell_exec(system::getCmdSudo() . 'rm -rf ' . $pid_file . ' 2>&1 > /dev/null');
   			}
   		}
-      $return['launchable'] = 'nok';
-      // $refresh_token = config::byKey('refresh_token', __CLASS__);
-      // if ($refresh_token == '')
-      // {
-      //   $return['launchable'] = 'nok';
-			// 	$return['launchable_message'] = __('Le port n\'est pas configuré', __FILE__);
-      // }
+      if (self::getClient() != null)
+      {
+        if (self::$_client->isAuth())
+        {
+          $return['launchable'] = 'ok';
+        }
+      }
+
       return $return;
     }
 
@@ -116,13 +118,16 @@
     /*     * -----------------------   Others   ---------------------------- */
     public static function getClient()
     {
-      if (self::$_client == null)
+      if (class_exists('KRCPA\Clients\krcpaClient'))
       {
-        $conf = array(
-          "username" => config::byKey('username', __CLASS__),
-          "password" => config::byKey('password', __CLASS__)
-        );
-        self::$_client = new KRCPA\Clients\krcpaClient($conf);
+        if (self::$_client == null)
+        {
+          $conf = array(
+            "username" => config::byKey('username', __CLASS__),
+            "password" => config::byKey('password', __CLASS__)
+          );
+          self::$_client = new KRCPA\Clients\krcpaClient($conf);
+        }
       }
       return self::$_client;
     }
@@ -139,13 +144,15 @@
       self::getClient();
       self::$_client->setVariable('auth_code',$code);
       $result = self::$_client->auth_password();
+      config::remove('username',__CLASS__);
+      config::remove('password',__CLASS__);
       if (array_key_exists("refresh_token",$result))
       {
         config::save('refresh_token',$result['refresh_token'],__CLASS__);
-        config::remove('username',__CLASS__);
-        config::remove('password',__CLASS__);
+        return true;
+      } else {
+        return false;
       }
-      return $result;
     }
 
    /*     * *********************Methode d'instance************************* */
