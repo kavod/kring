@@ -185,6 +185,47 @@
       return self::$_client;
     }
 
+    public static function syncDevices()
+    {
+      $nb_devices = 0;
+      if(self::getClient())
+      {
+        $devices = self::$_client->getDevices();
+        forearch($devices as $device)
+        {
+          try
+          {
+            $id = $device->getVariable('id');
+            $description = $device->getVariable('description');
+            $kind = $device->getVariable('kind');
+
+  	  			$eqLogic = self::byLogicalId($id, __CLASS__);
+  	  			if (!is_object($eqLogic)) {
+  	  				$eqLogic = new self();
+              foreach (jeeObject::all() as $object)
+              {
+                  if (stristr($description,$object->getName()))
+                  {
+                      $eqLogic->setObject_id($object->getId());
+                      break;
+                  }
+              }
+              $eqLogic->setLogicalId($id);
+  	  				$eqLogic->setName($description);
+  						$eqLogic->setConfiguration('type', $kind);
+  	  				$eqLogic->setEqType_name(__CLASS__);
+  	  				$eqLogic->setIsVisible(1);
+  	  				$eqLogic->setIsEnable(1);
+  	  				$eqLogic->save();
+  						$nb_devices++;
+            }
+  					$eqLogic->refreshWidget();
+          }
+        }
+      }
+      return $nb_devices;
+    }
+
     public static function askCode($username='',$password='') {
       config::save('username',$username,__CLASS__);
       config::save('password',$password,__CLASS__);
