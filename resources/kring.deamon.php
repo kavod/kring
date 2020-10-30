@@ -1,15 +1,15 @@
 <?php
-  require_once ('autoload.php');
+error_reporting(-1);
+ini_set('display_errors', 'On');
 
-  if ($argc<2 || $argc>3)
-    die("Usage: php deamon.php <configuration file> [url to push]");
+  require_once(__DIR__  . '/../class/kring.inc.php');
+  // require_once(__DIR__.'/../../../core/php/core.inc.php');
+  // require_once(__DIR__  . '/../php/kring.inc.php');
 
-  require($argv[1]);
+  // if ($argc<2 || $argc>3)
+  //   die("Usage: php deamon.php <configuration file> [url to push]");
   $conf = array(
-    "username" => $username,
-    "password" => $password,
-    "auth_code" => $auth_code,
-    "refresh_token" => $refresh_token
+    "refresh_token" => config::byKey('refresh_token','kring')
   );
   $client = new KRCPA\Clients\krcpaClient($conf);
   $client->auth_refresh();

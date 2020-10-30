@@ -22,6 +22,9 @@
  require_once(__DIR__  . '/../php/kring.inc.php');
 
  define('KRING_LIB_PATH',__DIR__.'/../../3rdparty/krcpa/autoload.php');
+ define('KRING_RES_PATH',__DIR__.'/../../resources');
+ // define('KRING_DEAMON',__CLASS__.'.deamon.php');
+ // define('KRING_DEAMON_PATH',KRING_RES_PATH.'/'.KRING_DEAMON);
  define('KRCPA_MIN_VERSION','0.1');
 
  error_reporting(-1);
@@ -37,6 +40,8 @@
  class kring extends eqLogic {
    /*     * *************************Attributs****************************** */
    private static $_client = null;
+   private static $KRING_DEAMON = __CLASS__.'.deamon.php';
+   private static $KRING_DEAMON_PATH = KRING_RES_PATH.'/'.self::$KRING_DEAMON;
 
    /*     * ***********************Methode static*************************** */
    /*     * ----------------------- Dependances ---------------------------- */
@@ -78,7 +83,7 @@
   		log::remove(__CLASS__ . '_update');
       $path_3rd_party = __DIR__.'/../../3rdparty/';
   		return array(
-				'script' => __DIR__ . '/../../resources/install.sh ' . $path_3rd_party . ' ' . jeedom::getTmpFolder('kring'),
+				'script' => KRING_RES_PATH . '/install.sh ' . $path_3rd_party . ' ' . jeedom::getTmpFolder('kring'),
 				'log' => log::getPathToLog(__CLASS__ . '_update')
 			);
   	}
@@ -109,11 +114,58 @@
     }
 
     public static function deamon_start($_debug = false) {
-
+      self::deamon_stop();
+      $deamon_info = self::deamon_info();
+  		if ($deamon_info['launchable'] != 'ok') {
+  			throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
+  		}
+      $cmd  = '/usr/bin/php '.$KRING_DEAMON_PATH;
+      log::add(__CLASS__, 'info', 'Lancement démon : ' . $cmd);
+      exec($cmd . ' >> ' . log::getPathToLog(__CLASS__) . ' 2>&1 &');
+  		$i = 0;
+  		while ($i < 30) {
+  			$deamon_info = self::deamon_info();
+  			if ($deamon_info['state'] == 'ok') {
+  				break;
+  			}
+  			sleep(1);
+  			$i++;
+  		}
+      if ($i >= 30)
+      {
+  			log::add(__CLASS__, 'error', 'Impossible de lancer le démon, relancer le démon en debug et vérifiez la log', 'unableStartDeamon');
+  			return false;
+  		}
+  		message::removeAll(__CLASS__, 'unableStartDeamon');
+  		log::add(__CLASS__, 'info', 'Démon openzwave lancé');
     }
 
     public static function deamon_stop() {
+      try
+      {
+        $deamon_info = self::deamon_info();
+  			if ($deamon_info['state'] == 'ok')
+        {
+  				try
+          {
 
+          }
+          catch (Exception $e)
+          {
+
+  				}
+  			}
+  			$pid_file = jeedom::getTmpFolder(__CLASS__) . '/deamon.pid';
+  			if (file_exists($pid_file))
+        {
+  				$pid = intval(trim(file_get_contents($pid_file)));
+  				system::kill($pid);
+  			}
+        system::kill($KRING_DEAMON);
+  			sleep(1);
+  		} catch (\Exception $e) {
+
+  		}
     }
     /*     * -----------------------   Others   ---------------------------- */
     public static function getClient()
@@ -123,8 +175,7 @@
         if (self::$_client == null)
         {
           $conf = array(
-            "username" => config::byKey('username', __CLASS__),
-            "password" => config::byKey('password', __CLASS__)
+            "refresh_token" => config::byKey('refresh_token', __CLASS__)
           );
           self::$_client = new KRCPA\Clients\krcpaClient($conf);
         }
