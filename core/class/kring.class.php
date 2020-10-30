@@ -41,7 +41,8 @@
    /*     * *************************Attributs****************************** */
    private static $_client = null;
    private static $KRING_DEAMON = __CLASS__.'.deamon.php';
-   private static $KRING_DEAMON_PATH = KRING_RES_PATH.'/'.self::$KRING_DEAMON;
+   private static $KRING_DEAMON_PATH = KRING_RES_PATH.'/'.__CLASS__.'.deamon.php';
+   //private static $KRING_DEAMON_PATH = KRING_RES_PATH.'/kring.deamon.php';
 
    /*     * ***********************Methode static*************************** */
    /*     * ----------------------- Dependances ---------------------------- */
@@ -119,7 +120,8 @@
   		if ($deamon_info['launchable'] != 'ok') {
   			throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
   		}
-      $cmd  = '/usr/bin/php '.$KRING_DEAMON_PATH;
+      $cmd  = '/usr/bin/php '.self::$KRING_DEAMON_PATH;
+      $cmd .= ' --pid="'.jeedom::getTmpFolder('kring') . '/deamon.pid"';
       log::add(__CLASS__, 'info', 'Lancement démon : ' . $cmd);
       exec($cmd . ' >> ' . log::getPathToLog(__CLASS__) . ' 2>&1 &');
   		$i = 0;
@@ -161,7 +163,7 @@
   				$pid = intval(trim(file_get_contents($pid_file)));
   				system::kill($pid);
   			}
-        system::kill($KRING_DEAMON);
+        system::kill(self::$KRING_DEAMON);
   			sleep(1);
   		} catch (\Exception $e) {
 
