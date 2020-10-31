@@ -19,7 +19,7 @@
  */
  error_reporting(-1);
  ini_set('display_errors', 'On');
- 
+
  try {
      require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
      include_file('core', 'authentification', 'php');
@@ -45,6 +45,15 @@
         ajax::success(__("Identification réussie",__FILE__));
       } else {
         ajax::error(__("Erreur d'authentification",__FILE__));
+      }
+    } elseif(init('action')=='findEquipments')
+    {
+      $result = kring::syncDevices();
+      if ($result>0)
+      {
+        ajax::success($result.__(" équipements trouvés",__FILE__));
+      } else {
+        ajax::error(__("Aucun équipement trouvé",__FILE__));
       }
     }
     throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));

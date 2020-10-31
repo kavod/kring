@@ -138,7 +138,7 @@ function askCode(username,password) {
  $('#btSync').on('click', function () {
      $.ajax({// fonction permettant de faire de l'ajax
          type: "POST", // methode de transmission des données au fichier php
-         url: "plugins/kring/core/ajax/kkasa.ajax.php", // url du fichier php
+         url: "plugins/kring/core/ajax/kring.ajax.php", // url du fichier php
          data: {
              action: "findEquipments",
          },

@@ -190,8 +190,9 @@
       $nb_devices = 0;
       if(self::getClient())
       {
-        $devices = self::$_client->getDevices();
-        forearch($devices as $device)
+        $devices = self::$_client->getDevices()['doorbots'];
+        log::add(__CLASS__, 'debug', print_r($devices,true));
+        foreach($devices as $device)
         {
           try
           {
@@ -220,6 +221,8 @@
   						$nb_devices++;
             }
   					$eqLogic->refreshWidget();
+          } catch (Exception $e) {
+              echo 'Exception reçue : ',  $e->getMessage(), "\n";
           }
         }
       }

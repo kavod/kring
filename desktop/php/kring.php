@@ -43,8 +43,8 @@ if (!isConnect('admin')) {
     </div>
   </div>
 
-  <!-- Boutons de gestion -->
   <div class="col-lg-10 col-md-9 col-sm-8 eqLogicThumbnailDisplay" style="border-left: solid 1px #EEE; padding-left: 25px;">
+    <!-- Boutons de gestion -->
     <legend><i class="fa fa-cog"></i>  {{Gestion}}</legend>
     <div class="eqLogicThumbnailContainer">
      <div class="cursor eqLogicAction" id="btSync" style="text-align: center; background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;">
@@ -58,10 +58,8 @@ if (!isConnect('admin')) {
         <span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676">{{Configuration}}</span>
       </div>
     </div>
-  </div>
 
-  <!-- Liste des équipements -->
-  <div class="eqLogicThumbnailContainer">
+    <!-- Liste des équipements -->
     <legend><i class="fa fa-table"></i> {{Mes périphériques}}</legend>
     <?php
     foreach ($eqLogics as $eqLogic) {
@@ -73,7 +71,7 @@ if (!isConnect('admin')) {
     	echo '</div>';
     }
     ?>
-  </div>
+</div>
 
   <!-- Vue équipement -->
   <div class="col-lg-10 col-md-9 col-sm-8 eqLogic" style="border-left: solid 1px #EEE; padding-left: 25px;display: none;">
