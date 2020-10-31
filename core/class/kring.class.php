@@ -38,10 +38,15 @@
  }
 
  class kring extends eqLogic {
+ 		const FEATURES = array(
+ 			'motions_enabled' => 'motion'
+ 		);
    /*     * *************************Attributs****************************** */
    private static $_client = null;
    private static $KRING_DEAMON = __CLASS__.'.deamon.php';
    private static $KRING_DEAMON_PATH = KRING_RES_PATH.'/'.__CLASS__.'.deamon.php';
+
+   private $_device = null;
    //private static $KRING_DEAMON_PATH = KRING_RES_PATH.'/kring.deamon.php';
 
    /*     * ***********************Methode static*************************** */
@@ -139,7 +144,7 @@
   			return false;
   		}
   		message::removeAll(__CLASS__, 'unableStartDeamon');
-  		log::add(__CLASS__, 'info', 'Démon openzwave lancé');
+  		log::add(__CLASS__, 'info', "Deamon ".__CLASS__." lancé");
     }
 
     public static function deamon_stop() {
@@ -170,20 +175,6 @@
   		}
     }
     /*     * -----------------------   Others   ---------------------------- */
-    public static function getClient()
-    {
-      if (class_exists('KRCPA\Clients\krcpaClient'))
-      {
-        if (self::$_client == null)
-        {
-          $conf = array(
-            "refresh_token" => config::byKey('refresh_token', __CLASS__)
-          );
-          self::$_client = new KRCPA\Clients\krcpaClient($conf);
-        }
-      }
-      return self::$_client;
-    }
 
     public static function syncDevices()
     {
@@ -197,8 +188,10 @@
           try
           {
             $id = $device->getVariable('id');
+            $device_id = $device->getVariable('device_id');
             $description = $device->getVariable('description');
             $kind = $device->getVariable('kind');
+            $battery_life = $device->getVariable('battery_life');
 
   	  			$eqLogic = self::byLogicalId($id, __CLASS__);
   	  			if (!is_object($eqLogic)) {
@@ -213,10 +206,12 @@
               }
               $eqLogic->setLogicalId($id);
   	  				$eqLogic->setName($description);
+  						$eqLogic->setConfiguration('device_id', $device_id);
   						$eqLogic->setConfiguration('type', $kind);
+              $eqLogic->batteryStatus($battery_life);
   	  				$eqLogic->setEqType_name(__CLASS__);
-  	  				$eqLogic->setIsVisible(1);
-  	  				$eqLogic->setIsEnable(1);
+  	  				$eqLogic->setIsVisible(0);
+  	  				$eqLogic->setIsEnable(0);
   	  				$eqLogic->save();
   						$nb_devices++;
             }
@@ -253,9 +248,204 @@
     }
 
    /*     * *********************Methode d'instance************************* */
+   public function postInsert() {
+    $this->loadCmdFromConf('all');
+   }
 
+   public function postSave() {
+     if ($this->getIsEnable())
+     {
+       if ($this->is_featured('motions_enabled'))
+       {
+         $curCmd = $this->getCmd(null, 'motion');
+         if (is_object($curCmd))
+         {
+           log::add(__CLASS__, 'debug', 'motion initialisé à 0');
+           $curCmd->event(0);
+         }
+       }
+     }
+   }
+
+   public function is_featured($feature)
+   {
+     $device = $this->getDevice();
+     return $device->is_featured($feature);
+   }
+
+   public function loadCmdFromConf($cmd='all',$force=0) {
+     log::add(__CLASS__, 'debug', "loadCmdFrom($cmd,$force)");
+     if ($cmd!='all')
+       $cmdSets = array($cmd);
+     else {
+       foreach($this->getCmd() as $curCmd)
+         $curCmd->remove();
+       $cmdSets = array('basic');
+       foreach(self::FEATURES as $feature => $cmdType)
+       {
+         if ($this->is_featured($feature))
+         {
+           $cmdSets[] = $cmdType;
+         }
+       }
+     }
+     $nb_cmd = 0;
+     foreach($cmdSets as $cmdSet)
+     {
+       $filename = dirname(__FILE__) . '/../config/' . $cmdSet.'.json';
+       if (!is_file($filename)) {
+         throw new \Exception("File $filename does not exist");
+       }
+       $device = is_json(file_get_contents($filename), array());
+       if (!is_array($device) || !isset($device['commands'])) {
+         break;
+       }
+       foreach($device['commands'] as $key => $cmd)
+       {
+         if (array_key_exists('logicalId',$cmd))
+           $id = $cmd['logicalId'];
+         else
+         {
+           if (array_key_exists('name',$cmd))
+             $id = $cmd['name'];
+           else {
+             $id = '';
+           }
+         }
+         $curCmd = $this->getCmd(null, $id);
+         if ($force==1 && is_object($curCmd)) {
+           $curCmd->remove();
+         } elseif (($force == 0) && is_object($curCmd)) {
+           unset($device['commands'][$key]);
+           continue;
+         }
+         if (array_key_exists('name',$cmd))
+           $cmd['name'] = __($cmd['name'],__FILE__);
+       }
+       if (count($device['commands'])>0)
+       {
+         $this->import($device);
+       }
+       $nb_cmd += count($device['commands']);
+     }
+     return $nb_cmd;
+   }
+
+   public function import($_configuration, $_dontRemove = false) {
+     $cmdClass = $this->getEqType_name() . 'Cmd';
+     if (isset($_configuration['configuration'])) {
+       foreach ($_configuration['configuration'] as $key => $value) {
+         $this->setConfiguration($key, $value);
+       }
+     }
+     if (isset($_configuration['category'])) {
+       foreach ($_configuration['category'] as $key => $value) {
+         $this->setCategory($key, $value);
+       }
+     }
+     $cmd_order = 0;
+     foreach($this->getCmd() as $liste_cmd)
+     {
+       if ($liste_cmd->getOrder()>$cmd_order)
+         $cmd_order = $liste_cmd->getOrder()+1;
+     }
+     $link_cmds = array();
+     $link_actions = array();
+     $arrayToRemove = [];
+     if (isset($_configuration['commands'])) {
+       foreach ($_configuration['commands'] as $command) {
+         $cmd = null;
+         foreach ($this->getCmd() as $liste_cmd) {
+           if ((isset($command['logicalId']) && $liste_cmd->getLogicalId() == $command['logicalId'])
+           || (isset($command['name']) && $liste_cmd->getName() == $command['name'])) {
+             $cmd = $liste_cmd;
+             break;
+           }
+         }
+         try {
+           if ($cmd === null || !is_object($cmd)) {
+             $cmd = new $cmdClass();
+             $cmd->setOrder($cmd_order);
+             $cmd->setEqLogic_id($this->getId());
+           } else {
+             $command['name'] = $cmd->getName();
+             if (isset($command['display'])) {
+               unset($command['display']);
+             }
+           }
+           utils::a2o($cmd, $command);
+           $cmd->setConfiguration('logicalId', $cmd->getLogicalId());
+           $cmd->save();
+           if (isset($command['value'])) {
+             $link_cmds[$cmd->getId()] = $command['value'];
+           }
+           if (isset($command['configuration']) && isset($command['configuration']['updateCmdId'])) {
+             $link_actions[$cmd->getId()] = $command['configuration']['updateCmdId'];
+           }
+           $cmd_order++;
+         } catch (Exception $exc) {
+           log::error(__CLASS__,'error','Error importing '.$command['name']);
+           throw $exc;
+         }
+         $cmd->event('');
+       }
+     }
+     if (count($link_cmds) > 0) {
+       foreach ($this->getCmd() as $eqLogic_cmd) {
+         foreach ($link_cmds as $cmd_id => $link_cmd) {
+           if ($link_cmd == $eqLogic_cmd->getLogicalId()) { // diff kkasa
+             $cmd = cmd::byId($cmd_id);
+             if (is_object($cmd)) {
+               $cmd->setValue($eqLogic_cmd->getId());
+               $cmd->save();
+             }
+           }
+         }
+       }
+     }
+     if (count($link_actions) > 0) {
+       foreach ($this->getCmd() as $eqLogic_cmd) {
+         foreach ($link_actions as $cmd_id => $link_action) {
+           if ($link_action == $eqLogic_cmd->getName()) {
+             $cmd = cmd::byId($cmd_id);
+             if (is_object($cmd)) {
+               $cmd->setConfiguration('updateCmdId', $eqLogic_cmd->getId());
+               $cmd->save();
+             }
+           }
+         }
+       }
+     }
+     $this->save();
+   }
 
    /*     * **********************Getteur Setteur*************************** */
+   public static function getClient()
+   {
+     if (class_exists('KRCPA\Clients\krcpaClient'))
+     {
+       if (self::$_client == null)
+       {
+         $conf = array(
+           "refresh_token" => config::byKey('refresh_token', __CLASS__)
+         );
+         self::$_client = new KRCPA\Clients\krcpaClient($conf);
+       }
+     }
+     return self::$_client;
+   }
+
+   public function getDevice() {
+     if ($this->_device == null) {
+       $client = self::getClient();
+       $this->_device = $client->getDeviceById(intval($this->getLogicalId()));
+       if (!is_object($this->_device))
+       {
+           log::add(__CLASS__, 'error', $this->getLogicalId().' introuvable');
+       }
+     }
+     return $this->_device;
+   }
  }
 
  class kringCmd extends cmd {
@@ -268,6 +458,12 @@
 
   /*     * *********************Methode d'instance************************* */
   public function execute($_options = array()) {
+    if ($this->getType() == 'info') {
+      return;
+    }
+    if ($this->getType() == '') {
+      return '';
+    }
 
   }
 

@@ -5,7 +5,10 @@
   error_reporting(-1);
   ini_set('display_errors', 'On');
 
+  define('KRING_CLASS','kring');
+
   require_once(__DIR__  . '/../core/class/kring.class.php');
+  log::add(KRING_CLASS, 'info', "Deamon ".KRING_CLASS."lancé");
 
   function rm_pidfile( int $signo =0, mixed $signinfo = null) : void
   {
@@ -13,6 +16,7 @@
     if (file_exists($pidfile)) {
         unlink($pidfile);
     }
+    log::add(KRING_CLASS, 'info', "Deamon ".KRING_CLASS." arrêté");
     exit(1);
   }
 
@@ -45,33 +49,26 @@
       $dings = $client->getActiveDings();
       foreach($dings as $ding)
       {
-        if ($argc==3)
+        log::add(KRING_CLASS, 'info', "Ding: ".print_r($ding,true));
+        $eqLogic = eqLogic::byLogicalId(intval($ding->getVariable('doorbot_id')), 'kring');
+        if (is_object($eqLogic))
         {
-          $url = $argv[2].'&value='.urlencode($ding->toString());
-          echo $url."\n";
-          $ch = curl_init();
-          $opts = array(
-              CURLOPT_CONNECTTIMEOUT => 10,
-              CURLOPT_RETURNTRANSFER => TRUE,
-              CURLOPT_HEADER         => TRUE,
-              CURLOPT_TIMEOUT        => 60,
-              CURLOPT_SSL_VERIFYPEER => TRUE,
-              CURLOPT_HTTPHEADER     => array(
-                  "Content-Type: application/json"
-                )
-          );
-          $opts[CURLOPT_HTTPGET] = true;
-          $opts[CURLOPT_URL] = $url;
-
-          curl_setopt_array($ch, $opts);
-          $result = curl_exec($ch);
-          $errno = curl_errno($ch);
-          $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-          echo $http_code."\n";
-          curl_close($ch);
+          if ($eqLogic->is_featured('motions_enabled'))
+          {
+            $cmd = $eqLogic->getCmd('info','motion');
+            if (is_object($cmd))
+            {
+              $cmd->event(1);
+            } else {
+              log::add(KRING_CLASS, 'debug', "Doorbot ".$ding->getVariable('doorbot_id').": no motion cmd found");
+            }
+          } else {
+            log::add(KRING_CLASS, 'debug', "Doorbot ".$ding->getVariable('doorbot_id')." does not support motion detection");
+          }
         } else {
-          echo $ding->toString()."\n";
+          log::add(KRING_CLASS, 'error', "Id: ".$ding->getVariable('doorbot_id')." inconnu");
         }
+        echo $ding->toString()."\n";
       }
       sleep(5);
     }

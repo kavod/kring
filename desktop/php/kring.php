@@ -71,7 +71,7 @@ if (!isConnect('admin')) {
     	echo '</div>';
     }
     ?>
-</div>
+  </div>
 
   <!-- Vue équipement -->
   <div class="col-lg-10 col-md-9 col-sm-8 eqLogic" style="border-left: solid 1px #EEE; padding-left: 25px;display: none;">
@@ -131,22 +131,22 @@ if (!isConnect('admin')) {
           </fieldset>
         </form>
       </div>
-      <div role="tabpanel" class="tab-pane" id="commandtab">
-        <a class="btn btn-success btn-sm cmdAction pull-right" data-action="add" style="margin-top:5px;"><i class="fa fa-plus-circle"></i> {{Commandes}}</a><br/><br/>
-        <table id="table_cmd" class="table table-bordered table-condensed">
-          <thead>
-            <tr>
-              <th>{{Nom}}</th>
-              <th>{{Type}}</th>
-              <th>{{Paramètres}}</th>
-              <th>{{Options}}</th>
-              <th>{{Action}}</th>
-            </tr>
-          </thead>
-          <tbody>
-          </tbody>
-        </table>
-      </div>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="commandtab">
+      <a class="btn btn-success btn-sm cmdAction pull-right" data-action="add" style="margin-top:5px;"><i class="fa fa-plus-circle"></i> {{Commandes}}</a><br/><br/>
+      <table id="table_cmd" class="table table-bordered table-condensed">
+        <thead>
+          <tr>
+            <th>{{Nom}}</th>
+            <th>{{Type}}</th>
+            <th>{{Paramètres}}</th>
+            <th>{{Options}}</th>
+            <th>{{Action}}</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>

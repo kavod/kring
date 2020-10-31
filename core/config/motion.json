@@ -1,0 +1,22 @@
+{
+    "commands": [
+        {
+            "name": "Mouvement",
+            "logicalId": "motion",
+            "type": "info",
+            "isVisible": 1,
+            "isHistorized": 1,
+            "subtype": "binary",
+            "returnStateTime": 1,
+            "returnStateValue": 0,
+            "template": {
+                "dashboard": "presence",
+                "mobile": "presence"
+            },
+            "display": {
+                "generic_type": "PRESENCE"
+            },
+            "value": 0
+        }
+    ]
+}

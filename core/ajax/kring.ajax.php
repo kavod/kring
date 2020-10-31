@@ -51,7 +51,7 @@
       $result = kring::syncDevices();
       if ($result>0)
       {
-        ajax::success($result.__(" équipements trouvés",__FILE__));
+        ajax::success($result);
       } else {
         ajax::error(__("Aucun équipement trouvé",__FILE__));
       }
