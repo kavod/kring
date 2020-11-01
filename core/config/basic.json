@@ -1,4 +1,18 @@
 {
     "commands": [
+        {
+            "name": "Sonette",
+            "logicalId": "ring",
+            "type": "info",
+            "isVisible": 1,
+            "isHistorized": 1,
+            "subtype": "binary",
+            "returnStateTime": 1,
+            "returnStateValue": 0,
+            "display": {
+                "generic_type": "BUTTON"
+            },
+            "value": 0
+        }
     ]
 }

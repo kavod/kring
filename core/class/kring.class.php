@@ -182,11 +182,12 @@
       if(self::getClient())
       {
         $devices = self::$_client->getDevices()['doorbots'];
-        log::add(__CLASS__, 'debug', print_r($devices,true));
+        log::add(__CLASS__, 'debug', 'GetDevices: '.print_r($devices,true));
         foreach($devices as $device)
         {
           try
           {
+            log::add(__CLASS__, 'debug', 'Adding device: '.print_r($device,true));
             $id = $device->getVariable('id');
             $device_id = $device->getVariable('device_id');
             $description = $device->getVariable('description');
@@ -195,26 +196,40 @@
 
   	  			$eqLogic = self::byLogicalId($id, __CLASS__);
   	  			if (!is_object($eqLogic)) {
+              log::add(__CLASS__, 'debug', 'Adding eqLogic '.$id.' does not exist yet. Creating!');
   	  				$eqLogic = new self();
               foreach (jeeObject::all() as $object)
               {
                   if (stristr($description,$object->getName()))
                   {
+                    log::add(__CLASS__, 'debug', 'Adding eqLogic '.$id.' Autoadd to object '.$object->getName());
                       $eqLogic->setObject_id($object->getId());
                       break;
                   }
               }
+              log::add(__CLASS__, 'debug', "Adding eqLogic $id setLogicalId($id)");
               $eqLogic->setLogicalId($id);
+              log::add(__CLASS__, 'debug', "Adding eqLogic $id setName($description)");
   	  				$eqLogic->setName($description);
+              log::add(__CLASS__, 'debug', "Adding eqLogic $id setConfiguration('device_id', $device_id)");
   						$eqLogic->setConfiguration('device_id', $device_id);
+              log::add(__CLASS__, 'debug', "Adding eqLogic $id setConfiguration('type', $kind)");
   						$eqLogic->setConfiguration('type', $kind);
-              $eqLogic->batteryStatus($battery_life);
+              log::add(__CLASS__, 'debug', "Adding eqLogic $id setEqType_name(".__CLASS__.")");
   	  				$eqLogic->setEqType_name(__CLASS__);
+              log::add(__CLASS__, 'debug', "Adding eqLogic $id setIsVisible(0)");
   	  				$eqLogic->setIsVisible(0);
+              log::add(__CLASS__, 'debug', "Adding eqLogic $id setIsEnable(0)");
   	  				$eqLogic->setIsEnable(0);
+              log::add(__CLASS__, 'debug', 'Adding eqLogic: '.print_r($eqLogic,true));
   	  				$eqLogic->save();
   						$nb_devices++;
+            } else
+            {
+              log::add(__CLASS__, 'debug', 'Adding eqLogic '.$id.' already exists. Skipping!');
             }
+            log::add(__CLASS__, 'debug', "EqLogic $id batteryStatus($battery_life)");
+            $eqLogic->batteryStatus($battery_life);
   					$eqLogic->refreshWidget();
           } catch (Exception $e) {
               echo 'Exception reçue : ',  $e->getMessage(), "\n";
@@ -490,9 +505,16 @@
     }
 
   }
-
   /*     * **********************Getteur Setteur*************************** */
+  public function setReturnStateTime($time)
+  {
+    $this->setConfiguration('returnStateTime',$time);
+  }
 
+  public function setReturnStateValue($value)
+  {
+    $this->setConfiguration('returnStateValue',$value);
+  }
 }
 
 ?>
