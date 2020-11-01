@@ -1,0 +1,26 @@
+{
+    "commands": [
+        {
+            "name": "Silencieux",
+            "logicalId": "getDnd",
+            "type": "binary",
+            "isVisible": 0,
+            "isHistorized": 0,
+            "subtype": "binary",
+            "returnStateTime": 1,
+            "returnStateValue": 0,
+            "value": 0
+        },
+        {
+            "name": "Rendre silencieux",
+            "logicalId": "setDnd",
+            "type": "action",
+            "isVisible": 0,
+            "configuration": {
+              "minValue": 0,
+              "maxValue": 518400
+            },
+            "subtype": "other"
+        }
+    ]
+}

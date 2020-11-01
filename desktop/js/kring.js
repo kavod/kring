@@ -78,7 +78,7 @@ function askCode(username,password) {
              var cmdType = $(this).attr("dataCmdType");
              var dialog_title = '{{Code de vérification}}';
              var dialog_message = '<form class="form-horizontal onsubmit="return false;"> ';
-             dialog_message += '<label class="control-label" > {{Un code de vérification a été envoyé au numéro suivant : ' + data.result + '}} </label> ' +
+             dialog_message += '<label class="control-label" > {{Un code de vérification a été envoyé sur : ' + data.result + '}} </label> ' +
              '<div> ' +
              '<input type="text" name="verif_code" id="verif_code" value="" /> ' +
              '</div> ';

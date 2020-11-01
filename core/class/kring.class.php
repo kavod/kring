@@ -23,8 +23,6 @@
 
  define('KRING_LIB_PATH',__DIR__.'/../../3rdparty/krcpa/autoload.php');
  define('KRING_RES_PATH',__DIR__.'/../../resources');
- // define('KRING_DEAMON',__CLASS__.'.deamon.php');
- // define('KRING_DEAMON_PATH',KRING_RES_PATH.'/'.KRING_DEAMON);
  define('KRCPA_MIN_VERSION','0.1');
 
  error_reporting(-1);
@@ -39,7 +37,10 @@
 
  class kring extends eqLogic {
  		const FEATURES = array(
- 			'motions_enabled' => 'motion'
+ 			'motions_enabled' => 'motion',
+ 			'ring' => 'ring',
+ 			'volume' => 'volume',
+ 			'dnd' => 'dnd'
  		);
    /*     * *************************Attributs****************************** */
    private static $_client = null;
@@ -181,9 +182,9 @@
       $nb_devices = 0;
       if(self::getClient())
       {
-        $devices = self::$_client->getDevices()['doorbots'];
+        $devices = self::$_client->getDevices();
         log::add(__CLASS__, 'debug', 'GetDevices: '.print_r($devices,true));
-        foreach($devices as $device)
+        foreach($devices['doorbots'] as $device)
         {
           try
           {
@@ -235,6 +236,55 @@
               echo 'Exception reçue : ',  $e->getMessage(), "\n";
           }
         }
+        foreach($devices['chimes'] as $device)
+        {
+          try
+          {
+            log::add(__CLASS__, 'debug', 'Adding device: '.print_r($device,true));
+            $id = $device->getVariable('id');
+            $device_id = $device->getVariable('device_id');
+            $description = $device->getVariable('description');
+            $kind = $device->getVariable('kind');
+
+  	  			$eqLogic = self::byLogicalId($id, __CLASS__);
+  	  			if (!is_object($eqLogic)) {
+              log::add(__CLASS__, 'debug', 'Adding eqLogic '.$id.' does not exist yet. Creating!');
+  	  				$eqLogic = new self();
+              foreach (jeeObject::all() as $object)
+              {
+                  if (stristr($description,$object->getName()))
+                  {
+                    log::add(__CLASS__, 'debug', 'Adding eqLogic '.$id.' Autoadd to object '.$object->getName());
+                      $eqLogic->setObject_id($object->getId());
+                      break;
+                  }
+              }
+              log::add(__CLASS__, 'debug', "Adding eqLogic $id setLogicalId($id)");
+              $eqLogic->setLogicalId($id);
+              log::add(__CLASS__, 'debug', "Adding eqLogic $id setName($description)");
+  	  				$eqLogic->setName($description);
+              log::add(__CLASS__, 'debug', "Adding eqLogic $id setConfiguration('device_id', $device_id)");
+  						$eqLogic->setConfiguration('device_id', $device_id);
+              log::add(__CLASS__, 'debug', "Adding eqLogic $id setConfiguration('type', $kind)");
+  						$eqLogic->setConfiguration('type', $kind);
+              log::add(__CLASS__, 'debug', "Adding eqLogic $id setEqType_name(".__CLASS__.")");
+  	  				$eqLogic->setEqType_name(__CLASS__);
+              log::add(__CLASS__, 'debug', "Adding eqLogic $id setIsVisible(0)");
+  	  				$eqLogic->setIsVisible(0);
+              log::add(__CLASS__, 'debug', "Adding eqLogic $id setIsEnable(0)");
+  	  				$eqLogic->setIsEnable(0);
+              log::add(__CLASS__, 'debug', 'Adding eqLogic: '.print_r($eqLogic,true));
+  	  				$eqLogic->save();
+  						$nb_devices++;
+            } else
+            {
+              log::add(__CLASS__, 'debug', 'Adding eqLogic '.$id.' already exists. Skipping!');
+            }
+  					$eqLogic->refreshWidget();
+          } catch (Exception $e) {
+              echo 'Exception reçue : ',  $e->getMessage(), "\n";
+          }
+        }
       }
       return $nb_devices;
     }
@@ -267,24 +317,19 @@
     $this->loadCmdFromConf('all');
    }
 
-   public function postSave() {
-     log::add(__CLASS__, 'debug', __CLASS__. $this->getLogicalId() . ': Sauvegarde terminée');
-     if ($this->getIsEnable())
-     {
-       log::add(__CLASS__, 'debug', __CLASS__. $this->getLogicalId() . ': Initialisation des cmds binaires');
-       $this->setInfo('motion',0);
-       $this->setInfo('ring',0);
-       // if ($this->is_featured('motions_enabled'))
-       // {
-       //   $curCmd = $this->getCmd(null, 'motion');
-       //   if (is_object($curCmd))
-       //   {
-       //     log::add(__CLASS__, 'debug', 'motion initialisé à 0');
-       //     $curCmd->event(0);
-       //   }
-       // }
-     }
-   }
+  public function postSave() {
+    log::add(__CLASS__, 'debug', __CLASS__. $this->getLogicalId() . ': Sauvegarde terminée');
+    if ($this->getIsEnable())
+    {
+      log::add(__CLASS__, 'debug', __CLASS__. $this->getLogicalId() . ': Initialisation des cmds binaires');
+      if ($this->is_featured('motions_enabled'))
+        $this->setInfo('motion',0);
+      if ($this->is_featured('ring'))
+        $this->setInfo('ring',0);
+      if ($this->is_featured('dnd'))
+        $this->setInfo('getDnd',0);
+    }
+  }
 
    public function is_featured($feature)
    {
@@ -454,7 +499,9 @@
        if (self::$_client == null)
        {
          $conf = array(
-           "refresh_token" => config::byKey('refresh_token', __CLASS__)
+           "username" => config::byKey('username',$_plugin=__CLASS__,$_default=''),
+           "password" => config::byKey('password',$_plugin=__CLASS__,$_default=''),
+           "refresh_token" => config::byKey('refresh_token', __CLASS__,$_default='')
          );
          self::$_client = new KRCPA\Clients\krcpaClient($conf);
        }
@@ -508,6 +555,11 @@
       return parent::getImage();
     }
   }
+
+  public function setDoNotDisturb($time=60) {
+    $device = $this->getDevice();
+    return $device->setDoNotDisturb($time);
+  }
  }
 
 
@@ -526,6 +578,11 @@
     }
     if ($this->getType() == '') {
       return '';
+    }
+    $eqLogic = $this->getEqLogic();
+    if ($this->getLogicalId() == 'setDnd') {
+      $eqLogic->setDoNotDisturb($_options['other']);
+      $this->setReturnStateTime($_options['other']);
     }
 
   }
