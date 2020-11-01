@@ -498,6 +498,16 @@
     log::error(__CLASS__,'error','Commande '.$cmd_name.' inconnue');
     return $default;
   }
+
+  public function getImage() {
+    $device = $this->getDevice();
+    $path = '/docs/images/'.$device->getVariable('kind','').'.png';
+    if (file_exists(__DIR__.'/../..'.$path))
+      return 'plugins/' . __CLASS__ . $path;
+    else {
+      return parent::getImage();
+    }
+  }
  }
 
 
