@@ -268,17 +268,21 @@
    }
 
    public function postSave() {
+     log::add(__CLASS__, 'debug', __CLASS__. $this->getLogicalId() . ': Sauvegarde terminée');
      if ($this->getIsEnable())
      {
-       if ($this->is_featured('motions_enabled'))
-       {
-         $curCmd = $this->getCmd(null, 'motion');
-         if (is_object($curCmd))
-         {
-           log::add(__CLASS__, 'debug', 'motion initialisé à 0');
-           $curCmd->event(0);
-         }
-       }
+       log::add(__CLASS__, 'debug', __CLASS__. $this->getLogicalId() . ': Initialisation des cmds binaires');
+       $this->setInfo('motion',0);
+       $this->setInfo('ring',0);
+       // if ($this->is_featured('motions_enabled'))
+       // {
+       //   $curCmd = $this->getCmd(null, 'motion');
+       //   if (is_object($curCmd))
+       //   {
+       //     log::add(__CLASS__, 'debug', 'motion initialisé à 0');
+       //     $curCmd->event(0);
+       //   }
+       // }
      }
    }
 
@@ -391,9 +395,18 @@
            utils::a2o($cmd, $command);
            $cmd->setConfiguration('logicalId', $cmd->getLogicalId());
            $cmd->save();
-           if (isset($command['value'])) {
-             $link_cmds[$cmd->getId()] = $command['value'];
+           log::add(__CLASS__, 'debug', $cmd->getLogicalId().' sauvegardé: '.print_r($cmd,true));
+           if ($this->getIsEnable())
+           {
+             if (isset($command['value'])) {
+               log::add(__CLASS__, 'debug', $cmd->getLogicalId().' initialisation à '.$command['value']);
+               $this->setInfo($cmd->getLogicalId(),$command['value']);
+             } else {
+               log::add(__CLASS__, 'debug', $cmd->getLogicalId().' initialisation à vide');
+               $this->setInfo($cmd->getLogicalId(),'');
+             }
            }
+
            if (isset($command['configuration']) && isset($command['configuration']['updateCmdId'])) {
              $link_actions[$cmd->getId()] = $command['configuration']['updateCmdId'];
            }
@@ -402,7 +415,6 @@
            log::error(__CLASS__,'error','Error importing '.$command['name']);
            throw $exc;
          }
-         $cmd->event('');
        }
      }
      if (count($link_cmds) > 0) {
@@ -464,24 +476,26 @@
 
   public function setInfo($cmd_name,$value)
   {
-    $cmd = $this->getCmd(null,$cmd_name);
+    $cmd = $this->getCmd('info',$cmd_name);
     if (is_object($cmd)) {
       $cmd->refresh();
       $changed = $this->checkAndUpdateCmd($cmd_name, $value);
-      log::add(__CLASS__,'debug','set: '.$cmd->getName().' to '. $value);
+      log::add(__CLASS__,'debug','set: '.$cmd->getName().' to '. $value.' ('.((int)$changed).')');
       $cmd->event($value,null,0);
       return $changed;
     }
+    log::error(__CLASS__,'error','Commande '.$cmd_name.' inconnue');
     return false;
   }
 
   public function getInfo($cmd_name,$default=null)
   {
-    $cmd = $this->getCmd(null,$cmd_name);
+    $cmd = $this->getCmd('info',$cmd_name);
     if (is_object($cmd)) {
       $cmd->refresh();
       return $cmd->getValue();
     }
+    log::error(__CLASS__,'error','Commande '.$cmd_name.' inconnue');
     return $default;
   }
  }
