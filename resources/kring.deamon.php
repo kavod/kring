@@ -53,17 +53,11 @@
         $eqLogic = eqLogic::byLogicalId(intval($ding->getVariable('doorbot_id')), 'kring');
         if (is_object($eqLogic))
         {
-          if ($eqLogic->is_featured('motions_enabled'))
+          if ($ding->getVariable('kind','')=='motion')
           {
-            $cmd = $eqLogic->getCmd('info','motion');
-            if (is_object($cmd))
-            {
-              $cmd->event(1);
-            } else {
+            $result = $eqLogic->setInfo('motion',1);
+            if (!$result)
               log::add(KRING_CLASS, 'debug', "Doorbot ".$ding->getVariable('doorbot_id').": no motion cmd found");
-            }
-          } else {
-            log::add(KRING_CLASS, 'debug', "Doorbot ".$ding->getVariable('doorbot_id')." does not support motion detection");
           }
         } else {
           log::add(KRING_CLASS, 'error', "Id: ".$ding->getVariable('doorbot_id')." inconnu");

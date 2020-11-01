@@ -446,7 +446,31 @@
      }
      return $this->_device;
    }
+
+  public function setInfo($cmd_name,$value)
+  {
+    $cmd = $this->getCmd(null,$cmd_name);
+    if (is_object($cmd)) {
+      $cmd->refresh();
+      $changed = $this->checkAndUpdateCmd($cmd_name, $value);
+      log::add(__CLASS__,'debug','set: '.$cmd->getName().' to '. $value);
+      $cmd->event($value,null,0);
+      return $changed;
+    }
+    return false;
+  }
+
+  public function getInfo($cmd_name,$default=null)
+  {
+    $cmd = $this->getCmd(null,$cmd_name);
+    if (is_object($cmd)) {
+      $cmd->refresh();
+      return $cmd->getValue();
+    }
+    return $default;
+  }
  }
+
 
  class kringCmd extends cmd {
 
