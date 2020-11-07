@@ -17,7 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
+ error_reporting(-1);
+ ini_set('display_errors', 'On');
+ 
 require_once(__DIR__  . '/../../../../core/php/core.inc.php');
 
 define('KRING_VERSION','0.1');

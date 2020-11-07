@@ -18,6 +18,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+error_reporting(-1);
+ini_set('display_errors', 'On');
+
  require_once(__DIR__  . '/../../../../core/php/core.inc.php');
  require_once(__DIR__  . '/../php/kring.inc.php');
 
@@ -25,8 +28,6 @@
  define('KRING_RES_PATH',__DIR__.'/../../resources');
  define('KRCPA_MIN_VERSION','0.1');
 
- error_reporting(-1);
- ini_set('display_errors', 'On');
 
  if (!class_exists('KRCPA\Clients\krcpaClient')) {
  	if (file_exists(KRING_LIB_PATH))
@@ -52,6 +53,28 @@
 
    /*     * ***********************Methode static*************************** */
    /*     * ----------------------- Dependances ---------------------------- */
+   public static function isDepOK()
+   {
+     if (class_exists('KRCPA\Clients\krcpaClient'))
+     {
+       if (version_compare(KRCPA\Clients\krcpaClient::getVersion(),KRCPA_MIN_VERSION,'<'))
+       {
+         $msg = __('Nouvelle version des dépendance requise.
+                    Merci de réinstaller les dépendances de '.__CLASS__
+                    ,__FILE__);
+         log::add(__CLASS__,'error',$msg);
+         throw new kringException($msg,402);
+       } else {
+         return true;
+       }
+     }
+    else {
+      $msg = __('Dépendances manquantes. Merci d\'installer les dépendances de kring',__FILE__);
+      log::add(__CLASS__,'error',$msg);
+      throw new kringException($msg,401);
+    }
+    return false;
+   }
 
     public static function dependancy_info()
     {
@@ -59,29 +82,42 @@
     		$return = array();
     		$return['log'] = 'kring_update';
     		$return['progress_file'] =  jeedom::getTmpFolder('kring') . '/dependancy_kring_in_progress';
-        if (class_exists('KRCPA\Clients\krcpaClient'))
+        try {
+          if (self::isDepOK()) {
+          	log::add(__CLASS__ . '_update','debug','Dependancy: OK');
+            $return['state'] = 'ok';
+          } else {
+          	log::add(__CLASS__ . '_update','debug','Dependancy: KO');
+            $return['state'] = 'ko';
+          }
+        } catch(kringException $e)
         {
-          try
-          {
-            if (version_compare(KRCPA\Clients\krcpaClient::getVersion(),KRCPA_MIN_VERSION,'<'))
-            {
-              log::add(__CLASS__,'error',
-              __('Nouvelle version des dépendance requise. Merci de réinstaller les dépendances de kring',__FILE__)
-  						);
-              $return['state'] = 'nok';
-            } else {
-              $return['state'] = 'ok';
-            }
-  				}
-  				catch (Exception $e)
-  				{
-  		   		$return['state'] = 'nok';
-  				}
-        } else
-        {
+        	log::add(__CLASS__ . '_update','debug','Dependancy: KO');
           $return['state'] = 'nok';
         }
-        log::add(__CLASS__,'debug','Dependancy_info: '.print_r($return,true));
+        // if (class_exists('KRCPA\Clients\krcpaClient'))
+        // {
+        //   try
+        //   {
+        //     if (version_compare(KRCPA\Clients\krcpaClient::getVersion(),KRCPA_MIN_VERSION,'<'))
+        //     {
+        //       log::add(__CLASS__,'error',
+        //       __('Nouvelle version des dépendance requise. Merci de réinstaller les dépendances de kring',__FILE__)
+  			// 			);
+        //       $return['state'] = 'nok';
+        //     } else {
+        //       $return['state'] = 'ok';
+        //     }
+  			// 	}
+  			// 	catch (Exception $e)
+  			// 	{
+  		  //  		$return['state'] = 'nok';
+  			// 	}
+        // } else
+        // {
+        //   $return['state'] = 'nok';
+        // }
+        //log::add(__CLASS__,'debug','Dependancy_info: '.print_r($return,true));
      		return $return;
     }
 
@@ -290,10 +326,44 @@
     }
 
     public static function askCode($username='',$password='') {
-      config::save('username',$username,__CLASS__);
-      config::save('password',$password,__CLASS__);
-      self::getClient();
-      return self::$_client->auth_password();
+      $msg = __('Requête du code de vérification',__FILE__);
+      log::add(__CLASS__,"debug",$msg);
+      try {
+        if (self::isDepOK()) {
+          config::save('username',$username,__CLASS__);
+          config::save('password',$password,__CLASS__);
+          self::getClient();
+          if (is_null(self::$_client))
+          {
+            $msg = __('Connexion impossible à Ring.com',__FILE__);
+            log::add(__CLASS__,"error",$msg);
+            return array('error' => $msg);
+          }
+          return self::$_client->auth_password();
+        }
+      } catch (KRCPA\Exceptions\krcpaApiException $e) {
+        if ($e->http_code == 412) // 2-step authentification required
+        {
+          log::add(__CLASS__,"debug","2 step authentification required: ".print_r($e->body,true));
+          return $e->body;
+        }
+        $msg = $e->code_description();
+        log::add(__CLASS__,"error",$msg);
+        return array('error' => $msg);
+      } catch(KRCPA\Exceptions\krcpaException $e)
+      {
+        $msg = $e->error;
+        log::add(__CLASS__,"error",$msg);
+        return array('error' => $msg);
+      } catch (Exception $e)
+      {
+        $msg = __('Erreur inconnue: '.print_r($e,true),__FILE__);
+        log::add(__CLASS__,"error",$msg);
+        return array('error' => $msg);
+      }
+      $msg = __('Erreur inconnue',__FILE__);
+      log::add(__CLASS__,"error",$msg);
+      return array('error' => $msg);
     }
 
     public static function authCode($code)
@@ -457,7 +527,7 @@
            }
            $cmd_order++;
          } catch (Exception $exc) {
-           log::error(__CLASS__,'error','Error importing '.$command['name']);
+           log::add(__CLASS__,'error','Error importing '.$command['name']);
            throw $exc;
          }
        }
@@ -505,6 +575,8 @@
          );
          self::$_client = new KRCPA\Clients\krcpaClient($conf);
        }
+     } else {
+       log::add(__CLASS__,'error','Dépendances manquantes');
      }
      return self::$_client;
    }
@@ -531,7 +603,7 @@
       $cmd->event($value,null,0);
       return $changed;
     }
-    log::error(__CLASS__,'error','Commande '.$cmd_name.' inconnue');
+    log::add(__CLASS__,'error','Commande '.$cmd_name.' inconnue');
     return false;
   }
 
@@ -542,7 +614,7 @@
       $cmd->refresh();
       return $cmd->getValue();
     }
-    log::error(__CLASS__,'error','Commande '.$cmd_name.' inconnue');
+    log::add(__CLASS__,'error','Commande '.$cmd_name.' inconnue');
     return $default;
   }
 
@@ -598,4 +670,16 @@
   }
 }
 
+class kringException extends \Exception
+{
+  public $http_code;
+  public $error;
+
+  function __construct($message,$code)
+  {
+    $this->http_code = $code;
+    $this->error = $message;
+    parent::__construct($message, $code);
+  }
+}
 ?>

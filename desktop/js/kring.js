@@ -132,6 +132,8 @@ function askCode(username,password) {
                $('#div_alert').showAlert({message: data.result, level: 'danger'});
                return;
            }
+           $('#div_alert').showAlert({message: "{{Authentification réussie}}", level: 'success'});
+           return;
          }
        });
  }

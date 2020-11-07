@@ -17,7 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
+ error_reporting(-1);
+ ini_set('display_errors', 'On');
+ 
 if (!isConnect('admin')) {
     throw new Exception('{{401 - Accès non autorisé}}');
  }

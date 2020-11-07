@@ -34,7 +34,7 @@
       $result = kring::askCode(init('username'),init('password'));
       if (array_key_exists('error',$result))
       {
-        ajax::error(__("Erreur d'authentification",__FILE__));
+        ajax::error(__("Erreur :".$result['error'],__FILE__));
       }
       ajax::success($result['phone']);
     } elseif (init('action') == 'authCode')
@@ -44,7 +44,10 @@
       {
         ajax::success(__("Identification réussie",__FILE__));
       } else {
-        ajax::error(__("Erreur d'authentification",__FILE__));
+        if (array_key_exists('error',$result))
+          ajax::error(__("Erreur :".$result['error'],__FILE__));
+        else
+          ajax::error(__("Erreur d'authentification",__FILE__));
       }
     } elseif(init('action')=='findEquipments')
     {
