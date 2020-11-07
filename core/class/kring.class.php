@@ -619,12 +619,17 @@ ini_set('display_errors', 'On');
   }
 
   public function getImage() {
-    $device = $this->getDevice();
-    $path = '/docs/images/'.$device->getVariable('kind','').'.png';
-    if (file_exists(__DIR__.'/../..'.$path))
+    try {
+      $device = $this->getDevice();
+      $path = '/docs/images/'.$device->getVariable('kind','').'.png';
+      if (file_exists(__DIR__.'/../..'.$path))
+        return 'plugins/' . __CLASS__ . $path;
+      else {
+        return parent::getImage();
+      }
+    } catch (KRCPA\Exceptions\krcpaApiException $e)
+    {
       return 'plugins/' . __CLASS__ . $path;
-    else {
-      return parent::getImage();
     }
   }
 

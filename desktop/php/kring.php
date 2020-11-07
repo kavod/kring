@@ -19,7 +19,7 @@
  */
  error_reporting(-1);
  ini_set('display_errors', 'On');
- 
+
 if (!isConnect('admin')) {
     throw new Exception('{{401 - Accès non autorisé}}');
  }
