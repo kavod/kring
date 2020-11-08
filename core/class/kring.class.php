@@ -396,8 +396,9 @@ ini_set('display_errors', 'On');
         $this->setInfo('motion',0);
       if ($this->is_featured('ring'))
         $this->setInfo('ring',0);
-      if ($this->is_featured('dnd'))
-        $this->setInfo('getDnd',0);
+
+      log::add(__CLASS__, 'debug', __CLASS__. $this->getLogicalId() . ': Refresh');
+      $this->refresh_values();
     }
   }
 
@@ -561,6 +562,22 @@ ini_set('display_errors', 'On');
      $this->save();
    }
 
+   public function refresh_values()
+   {
+     $device = $this->getDevice();
+
+     $changed = false;
+     if ($this->is_featured('dnd'))
+     {
+        $changed = $this->setInfo('getDnd',$device->getDoNotDisturb()) || $changed;
+     }
+
+     if ($changed) {
+       $this->refreshWidget();
+     }
+
+   }
+
    /*     * **********************Getteur Setteur*************************** */
    public static function getClient()
    {
@@ -658,8 +675,17 @@ ini_set('display_errors', 'On');
     }
     $eqLogic = $this->getEqLogic();
     if ($this->getLogicalId() == 'setDnd') {
-      $eqLogic->setDoNotDisturb($_options['other']);
-      $this->setReturnStateTime($_options['other']);
+      $eqLogic->setDoNotDisturb($_options['message']);
+      $cmdGetDnd = $eqLogic->getCmd('info', 'getDnd');
+      if (is_object($cmdGetDnd)) {
+        log::add(__CLASS__,'debug','set: '.$cmdGetDnd->getName().' returnStateTime to: '.$_options['message']);
+        $cmdGetDnd->setReturnStateValue(0);
+        $cmdGetDnd->setReturnStateTime(intval($_options['message']));
+      }
+      $eqLogic->refresh_values();
+    }
+    if ($this->getLogicalId() == 'refresh') {
+      $eqLogic->refresh_values();
     }
 
   }
@@ -667,11 +693,13 @@ ini_set('display_errors', 'On');
   public function setReturnStateTime($time)
   {
     $this->setConfiguration('returnStateTime',$time);
+    $this->save();
   }
 
   public function setReturnStateValue($value)
   {
     $this->setConfiguration('returnStateValue',$value);
+    $this->save();
   }
 }
 

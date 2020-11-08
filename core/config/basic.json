@@ -1,4 +1,12 @@
 {
     "commands": [
+                  {
+                      "name": "Rafraîchir",
+                      "logicalId": "refresh",
+                      "type": "action",
+                      "isVisible": 1,
+                      "isRefreshCmd": 1,
+                      "subtype": "other"
+                  }
     ]
 }

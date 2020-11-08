@@ -3,7 +3,7 @@
         {
             "name": "Silencieux",
             "logicalId": "getDnd",
-            "type": "binary",
+            "type": "info",
             "isVisible": 0,
             "isHistorized": 0,
             "subtype": "binary",
@@ -18,9 +18,15 @@
             "isVisible": 0,
             "configuration": {
               "minValue": 0,
-              "maxValue": 518400
+              "maxValue": 1440
             },
-            "subtype": "other"
+            "subtype": "message",
+            "display": {
+              "title_disable": 1,
+              "message_placeholder":"Dur\u00e9e (minutes)",
+              "icon":"",
+              "invertBinary":"0"
+            }
         }
     ]
 }
