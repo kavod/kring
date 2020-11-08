@@ -37,6 +37,7 @@
         ajax::error(__("Erreur :".$result['error'],__FILE__));
       }
       ajax::success($result['phone']);
+
     } elseif (init('action') == 'authCode')
     {
       $result = kring::authCode(init('verif_code'));
@@ -49,6 +50,7 @@
         else
           ajax::error(__("Erreur d'authentification",__FILE__));
       }
+      
     } elseif(init('action')=='findEquipments')
     {
       $result = kring::syncDevices();

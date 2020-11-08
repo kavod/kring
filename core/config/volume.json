@@ -1,4 +1,39 @@
 {
     "commands": [
+        {
+            "name": "Volume",
+            "logicalId": "getVolume",
+            "type": "info",
+            "isVisible": 0,
+            "isHistorized": 0,
+            "subtype": "numeric",
+            "configuration": {
+              "minValue": 0,
+              "maxValue": 10
+            },
+            "display": {
+                "generic_type": "VOLUME"
+            }
+        },
+        {
+            "name": "Régler volume",
+            "logicalId": "setVolume",
+            "type": "action",
+            "isVisible": 0,
+            "configuration": {
+              "minValue": 0,
+              "maxValue": 10
+            },
+            "subtype": "message",
+            "display": {
+              "title_disable": 1,
+              "message_placeholder":"Niveau (0 à 10)",
+              "icon":"",
+              "invertBinary":"0"
+            },
+            "display": {
+                "generic_type": "SET_VOLUME"
+            }
+        }
     ]
 }

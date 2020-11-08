@@ -418,6 +418,7 @@ ini_set('display_errors', 'On');
        $cmdSets = array('basic');
        foreach(self::FEATURES as $feature => $cmdType)
        {
+         log::add(__CLASS__, 'debug', "is featured ".$feature."? ".($this->is_featured($feature)));
          if ($this->is_featured($feature))
          {
            $cmdSets[] = $cmdType;
@@ -570,6 +571,10 @@ ini_set('display_errors', 'On');
      if ($this->is_featured('dnd'))
      {
         $changed = $this->setInfo('getDnd',$device->getDoNotDisturb()) || $changed;
+     }
+     if ($this->is_featured('volume'))
+     {
+        $changed = $this->setInfo('getVolume',$device->getVolume()) || $changed;
      }
 
      if ($changed) {
