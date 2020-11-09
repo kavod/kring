@@ -123,6 +123,7 @@ ini_set('display_errors', 'On');
 
     public static function dependancy_install()
     {
+      log::add(__CLASS__, 'info', 'Réinstallation des dépendances');
   		log::remove(__CLASS__ . '_update');
       $path_3rd_party = __DIR__.'/../../3rdparty/';
   		return array(
@@ -659,6 +660,11 @@ ini_set('display_errors', 'On');
     $device = $this->getDevice();
     return $device->setDoNotDisturb($time);
   }
+
+  public function setVolume($vol) {
+    $device = $this->getDevice();
+    return $device->setVolume($vol);
+  }
  }
 
 
@@ -688,8 +694,11 @@ ini_set('display_errors', 'On');
         $cmdGetDnd->setReturnStateTime(intval($_options['message']));
       }
       $eqLogic->refresh_values();
-    }
-    if ($this->getLogicalId() == 'refresh') {
+    } elseif ($this->getLogicalId() == 'refresh') {
+      $eqLogic->refresh_values();
+    } elseif ($this->getLogicalId() == 'setVolume') {
+      $eqLogic->setVolume($_options['message']);
+      $cmdGetVol = $eqLogic->getCmd('info', 'getVolume');
       $eqLogic->refresh_values();
     }
 

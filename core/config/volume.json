@@ -29,10 +29,8 @@
               "title_disable": 1,
               "message_placeholder":"Niveau (0 à 10)",
               "icon":"",
-              "invertBinary":"0"
-            },
-            "display": {
-                "generic_type": "SET_VOLUME"
+              "invertBinary":"0",
+              "generic_type": "SET_VOLUME"
             }
         }
     ]
