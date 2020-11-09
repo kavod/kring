@@ -697,7 +697,7 @@ ini_set('display_errors', 'On');
     } elseif ($this->getLogicalId() == 'refresh') {
       $eqLogic->refresh_values();
     } elseif ($this->getLogicalId() == 'setVolume') {
-      $eqLogic->setVolume($_options['message']);
+      $eqLogic->setVolume($_options['slider']);
       $cmdGetVol = $eqLogic->getCmd('info', 'getVolume');
       $eqLogic->refresh_values();
     }

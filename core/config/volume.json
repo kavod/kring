@@ -19,17 +19,14 @@
             "name": "Régler volume",
             "logicalId": "setVolume",
             "type": "action",
-            "isVisible": 0,
+            "isVisible": 1,
             "configuration": {
               "minValue": 0,
               "maxValue": 10
             },
-            "subtype": "message",
+            "subType":"slider",
+            "value":"getVolume",
             "display": {
-              "title_disable": 1,
-              "message_placeholder":"Niveau (0 à 10)",
-              "icon":"",
-              "invertBinary":"0",
               "generic_type": "SET_VOLUME"
             }
         }
