@@ -27,6 +27,8 @@ if (!isConnect('admin')) {
  include_file('desktop', 'kring', 'css','kring');
  sendVarToJS('eqType', $plugin->getId());
  $eqLogics = eqLogic::byType($plugin->getId());
+
+ $debug = (intval(log::getLogLevel('kring')) <=100);
  ?>
 
 <div class="row row-overflow">
@@ -132,25 +134,20 @@ if (!isConnect('admin')) {
                 <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked/>{{Visible}}</label>
               </div>
             </div>
-      			<?php
-      			if (intval(log::getLogLevel('kring')) <=100)
-      			{
-      				?>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">{{Identifiant Equipement}}</label>
-                <div class="col-sm-6">
-                    <input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="device_id"/>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">{{Equipements liés}}</label>
-                <div class="col-sm-6">
-                    <input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="linked_devices"/>
-                </div>
-            </div>
-      			<?php
-            }
-      				?>
+            <div style="display:<?php echo ($debug) ? 'block' : 'none'; ?>">
+              <div class="form-group">
+                  <label class="col-sm-3 control-label">{{Identifiant Equipement}}</label>
+                  <div class="col-sm-6">
+                      <input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="device_id"/>
+                  </div>
+              </div>
+              <div class="form-group">
+                  <label class="col-sm-3 control-label">{{Equipements liés}}</label>
+                  <div class="col-sm-6">
+                      <input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="linked_devices"/>
+                  </div>
+              </div>
+      			</div>
           </fieldset>
         </form>
       </div>
