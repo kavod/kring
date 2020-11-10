@@ -282,6 +282,13 @@ ini_set('display_errors', 'On');
             $device_id = $device->getVariable('device_id');
             $description = $device->getVariable('description');
             $kind = $device->getVariable('kind');
+            $doorbells = ($kind=='chime') ? $device->getLinkedDoorbells() : array();
+            $arr_linkedDoorbells = array();
+            foreach($doorbells as $doorbell)
+            {
+              $arr_linkedDoorbells[] = $doorbell->getVariable('id');
+            }
+            $linkedDoorbells = json_encode($arr_linkedDoorbells);
 
   	  			$eqLogic = self::byLogicalId($id, __CLASS__);
   	  			if (!is_object($eqLogic)) {
@@ -304,6 +311,8 @@ ini_set('display_errors', 'On');
   						$eqLogic->setConfiguration('device_id', $device_id);
               log::add(__CLASS__, 'debug', "Adding eqLogic $id setConfiguration('type', $kind)");
   						$eqLogic->setConfiguration('type', $kind);
+              log::add(__CLASS__, 'debug', "Adding eqLogic $id setConfiguration('linked_devices', $linkedDoorbells)");
+  						$eqLogic->setConfiguration('linked_devices', $linkedDoorbells);
               log::add(__CLASS__, 'debug', "Adding eqLogic $id setEqType_name(".__CLASS__.")");
   	  				$eqLogic->setEqType_name(__CLASS__);
               log::add(__CLASS__, 'debug', "Adding eqLogic $id setIsVisible(0)");
@@ -581,6 +590,14 @@ ini_set('display_errors', 'On');
      if ($changed) {
        $this->refreshWidget();
      }
+
+     $doorbells = ($this->getConfiguration('type') =='chime') ? $device->getLinkedDoorbells() : array();
+     $arr_linkedDoorbells = array();
+     foreach($doorbells as $doorbell)
+     {
+       $arr_linkedDoorbells[] = $doorbell->getVariable('id');
+     }
+     $linkedDoorbells = json_encode($arr_linkedDoorbells);
 
    }
 

@@ -132,8 +132,40 @@ if (!isConnect('admin')) {
                 <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked/>{{Visible}}</label>
               </div>
             </div>
+      			<?php
+      			if (intval(log::getLogLevel('kring')) <=100)
+      			{
+      				?>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{{Identifiant Equipement}}</label>
+                <div class="col-sm-6">
+                    <input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="device_id"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{{Equipements liés}}</label>
+                <div class="col-sm-6">
+                    <input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="linked_devices"/>
+                </div>
+            </div>
+      			<?php
+            }
+      				?>
           </fieldset>
         </form>
+      </div>
+      <legend class="col-lg-8"><i class="fa fa-link"></i> {{Equipements liés}}</legend>
+      <div class="eqLogicThumbnailContainer col-lg-8" id="linkedDevices">
+        <?php
+        foreach ($eqLogics as $eqLogic) {
+        	$opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
+        	echo '<div class="eqLogicDisplayCard cursor" data-id="' . $eqLogic->getDevice()->getVariable('id','') . '" data-eqLogic_id="' . $eqLogic->getId() . '" style="text-align: center; background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;' . $opacity . '" >';
+        	echo '<img src="' . $eqLogic->getImage() . '" height="105" width="95" />';
+        	echo "<br>";
+        	echo '<span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;">' . $eqLogic->getHumanName(true, true) . '</span>';
+        	echo '</div>';
+        }
+        ?>
       </div>
     </div>
     <div role="tabpanel" class="tab-pane" id="commandtab">

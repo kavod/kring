@@ -56,6 +56,19 @@
    });
  });
 
+ $(document).ready(function() {
+   $(".eqLogicAttr[data-l2key='linked_devices']").change(function(){
+     $(".eqLogicThumbnailContainer#linkedDevices .eqLogicDisplayCard").hide();
+     var linked_devices = $(this).val();
+     if (linked_devices!='')
+     {
+       var obj_dev = jQuery.parseJSON( linked_devices );
+       obj_dev.forEach(device => $(".eqLogicThumbnailContainer#linkedDevices " +
+        ".eqLogicDisplayCard[data-id='"+device+"']").show());
+     }
+   });
+ });
+
 function askCode(username,password) {
      $.ajax({// fonction permettant de faire de l'ajax
          type: "POST", // methode de transmission des données au fichier php
