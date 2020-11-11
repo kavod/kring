@@ -143,7 +143,8 @@ ini_set('display_errors', 'On');
   			if (posix_getsid(trim(file_get_contents($pid_file)))) {
   				$return['state'] = 'ok';
   			} else {
-  				shell_exec(system::getCmdSudo() . 'rm -rf ' . $pid_file . ' 2>&1 > /dev/null');
+          $cmd = system::getCmdSudo() . 'rm -rf ' . $pid_file . ' 2>&1 > /dev/null';
+  				shell_exec($cmd);
   			}
   		}
       if (self::getClient() != null)
@@ -151,7 +152,11 @@ ini_set('display_errors', 'On');
         if (self::$_client->isAuth())
         {
           $return['launchable'] = 'ok';
+        } else {
+          log::add(__CLASS__, 'error', 'Lancement démon : authentification en échec ');
         }
+      } else {
+        log::add(__CLASS__, 'error', 'Lancement démon : impossible de trouver le client');
       }
 
       return $return;
@@ -163,10 +168,15 @@ ini_set('display_errors', 'On');
   		if ($deamon_info['launchable'] != 'ok') {
   			throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
   		}
+      $logfile = log::getPathToLog(__CLASS__.'_deamon');
+      touch($logfile);
+      $logfile = realpath($logfile);
+
       $cmd  = '/usr/bin/php '.self::$KRING_DEAMON_PATH;
       $cmd .= ' --pid="'.jeedom::getTmpFolder('kring') . '/deamon.pid"';
+      $cmd .= ' >> ' . $logfile . ' 2>&1 &';
       log::add(__CLASS__, 'info', 'Lancement démon : ' . $cmd);
-      exec($cmd . ' >> ' . log::getPathToLog(__CLASS__) . ' 2>&1 &');
+      exec($cmd);
   		$i = 0;
   		while ($i < 30) {
   			$deamon_info = self::deamon_info();
@@ -311,8 +321,8 @@ ini_set('display_errors', 'On');
   						$eqLogic->setConfiguration('device_id', $device_id);
               log::add(__CLASS__, 'debug', "Adding eqLogic $id setConfiguration('type', $kind)");
   						$eqLogic->setConfiguration('type', $kind);
-              log::add(__CLASS__, 'debug', "Adding eqLogic $id setConfiguration('linked_devices', $linkedDoorbells)");
-  						$eqLogic->setConfiguration('linked_devices', $linkedDoorbells);
+              // log::add(__CLASS__, 'debug', "Adding eqLogic $id setConfiguration('linked_devices', $linkedDoorbells)");
+  						// $eqLogic->setConfiguration('linked_devices', $linkedDoorbells);
               log::add(__CLASS__, 'debug', "Adding eqLogic $id setEqType_name(".__CLASS__.")");
   	  				$eqLogic->setEqType_name(__CLASS__);
               log::add(__CLASS__, 'debug', "Adding eqLogic $id setIsVisible(0)");
@@ -395,6 +405,28 @@ ini_set('display_errors', 'On');
    /*     * *********************Methode d'instance************************* */
    public function postInsert() {
     $this->loadCmdFromConf('all');
+   }
+
+   public function preSave() {
+     $linked_devices = array();
+     switch($this->getConfiguration('type'))
+     {
+       case 'chime':
+        $linked_devices = $device->getLinkedDoorbells();
+        break;
+      case 'doorbell_v4':
+       $linked_devices = $device->getLinkedChimes();
+       break;
+     }
+     log::add(__CLASS__, 'debug', $this->getLogicalId().': '. count($linked_devices).' équipement(s) lié(s) trouvé(s)');
+     //$doorbells = ($this->getConfiguration('type') =='chime') ? $device->getLinkedDoorbells() : array();
+     $arr_linked_devices = array();
+     foreach($linked_devices as $linked_device)
+     {
+       $arr_linked_devices[] = $linked_device->getVariable('id');
+     }
+     $linkedDevices = json_encode($arr_linked_devices);
+     $this->setConfiguration('linked_devices', $linkedDevices);
    }
 
   public function postSave() {
@@ -590,15 +622,6 @@ ini_set('display_errors', 'On');
      if ($changed) {
        $this->refreshWidget();
      }
-
-     $doorbells = ($this->getConfiguration('type') =='chime') ? $device->getLinkedDoorbells() : array();
-     $arr_linkedDoorbells = array();
-     foreach($doorbells as $doorbell)
-     {
-       $arr_linkedDoorbells[] = $doorbell->getVariable('id');
-     }
-     $linkedDoorbells = json_encode($arr_linkedDoorbells);
-
    }
 
    /*     * **********************Getteur Setteur*************************** */

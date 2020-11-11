@@ -142,6 +142,12 @@ if (!isConnect('admin')) {
                   </div>
               </div>
               <div class="form-group">
+                  <label class="col-sm-3 control-label">{{Type}}</label>
+                  <div class="col-sm-6">
+                      <input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="type"/>
+                  </div>
+              </div>
+              <div class="form-group">
                   <label class="col-sm-3 control-label">{{Equipements liés}}</label>
                   <div class="col-sm-6">
                       <input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="linked_devices"/>
