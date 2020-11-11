@@ -1,0 +1,26 @@
+{
+    "commands": [
+        {
+            "name": "Dernière capture",
+            "logicalId": "snapshot",
+            "type": "info",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "subType": "string",
+            "template": {
+                "dashboard": "buttonImage",
+                "mobile": "buttonImage"
+            }
+        },
+        {
+            "name": "Rafraichir capture",
+            "logicalId": "takeSnapshot",
+            "type": "action",
+            "isVisible": 1,
+            "subType":"other",
+            "display": {
+              "generic_type": "CAMERA_TAKE"
+            }
+        }
+    ]
+}

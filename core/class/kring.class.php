@@ -42,7 +42,8 @@ ini_set('display_errors', 'On');
  			'ring' => 'ring',
  			'volume' => 'volume',
  			'dnd' => 'dnd',
- 			'play_sound' => 'play_sound'
+ 			'play_sound' => 'play_sound',
+      'snapshots' => 'snapshots'
  		);
    /*     * *************************Attributs****************************** */
    private static $_client = null;
@@ -708,6 +709,15 @@ ini_set('display_errors', 'On');
     $device = $this->getDevice();
     return $device->setVolume($vol);
   }
+
+  public function getSnapshot() {
+    $device = $this->getDevice();
+    $root_path = '../../../../';
+    $res_path = 'plugins/'.__CLASS__.'/resources/';
+    $relative_path = $res_path.$device->getVariable('id').'.jpg';
+    $snap_path = $device->getSnapshot($root_path.$relative_path);
+    $this->setInfo('snapshot',$relative_path);
+  }
  }
 
 
@@ -746,6 +756,8 @@ ini_set('display_errors', 'On');
     } elseif ($this->getLogicalId() == 'play_sound') {
       $kind = ($_options['select']=="0") ? 'motion' : 'ding';
       $eqLogic->play_sound($kind);
+    } elseif ($this->getLogicalId() == 'takeSnapshot') {
+      $eqLogic->getSnapshot();
     }
 
   }
