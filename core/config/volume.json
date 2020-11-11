@@ -6,7 +6,7 @@
             "type": "info",
             "isVisible": 0,
             "isHistorized": 0,
-            "subtype": "numeric",
+            "subType": "numeric",
             "configuration": {
               "minValue": 0,
               "maxValue": 10

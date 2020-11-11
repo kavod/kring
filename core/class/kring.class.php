@@ -408,6 +408,7 @@ ini_set('display_errors', 'On');
    }
 
    public function preSave() {
+     $device = $this->getDevice();
      $linked_devices = array();
      switch($this->getConfiguration('type'))
      {
@@ -555,15 +556,8 @@ ini_set('display_errors', 'On');
            $cmd->setConfiguration('logicalId', $cmd->getLogicalId());
            $cmd->save();
            log::add(__CLASS__, 'debug', $cmd->getLogicalId().' sauvegardé: '.print_r($cmd,true));
-           if ($this->getIsEnable())
-           {
-             if (isset($command['value'])) {
-               log::add(__CLASS__, 'debug', $cmd->getLogicalId().' initialisation à '.$command['value']);
-               $this->setInfo($cmd->getLogicalId(),$command['value']);
-             } else {
-               log::add(__CLASS__, 'debug', $cmd->getLogicalId().' initialisation à vide');
-               $this->setInfo($cmd->getLogicalId(),'');
-             }
+           if (isset($command['value'])) {
+             $link_cmds[$cmd->getId()] = $command['value'];
            }
 
            if (isset($command['configuration']) && isset($command['configuration']['updateCmdId'])) {
