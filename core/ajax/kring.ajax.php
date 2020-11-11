@@ -50,7 +50,7 @@
         else
           ajax::error(__("Erreur d'authentification",__FILE__));
       }
-      
+
     } elseif(init('action')=='findEquipments')
     {
       $result = kring::syncDevices();
@@ -60,6 +60,14 @@
       } else {
         ajax::error(__("Aucun équipement trouvé",__FILE__));
       }
+    } elseif(init('action') == 'createCmd') {
+      $id = init('id');
+      $device = eqLogic::byId($id);
+      $nb_cmd = $device->loadCmdFromConf(init('cmdType'),init('createcommand'));
+      if ($nb_cmd < 0)
+        ajax::error(__("Erreur durant l'ajout des commandes",__FILE__));
+      else
+        ajax::success("Cool");
     }
     throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
     /*     * *********Catch exeption*************** */

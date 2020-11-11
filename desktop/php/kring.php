@@ -92,19 +92,22 @@ if (!isConnect('admin')) {
     <div class="tab-content" style="height:calc(100% - 50px);overflow:auto;overflow-x: hidden;">
       <div role="tabpanel" class="tab-pane active" id="eqlogictab">
         <br/>
-        <div class="col-lg-8">
+        <div class="col-lg-2">
+          <img id="eqLogic_img" height="172" width="150" />
+        </div>
+        <div class="col-lg-6">
           <form class="form-horizontal">
             <fieldset>
               <div class="form-group">
-                  <label class="col-sm-3 control-label">{{Nom de l'équipement}}</label>
-                  <div class="col-sm-6">
+                  <label class="col-sm-4 control-label">{{Nom de l'équipement}}</label>
+                  <div class="col-sm-8">
                       <input type="text" class="eqLogicAttr form-control" data-l1key="id" style="display : none;" />
                       <input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom de l'équipement}}"/>
                   </div>
               </div>
               <div class="form-group">
-                  <label class="col-sm-3 control-label" >{{Objet parent}}</label>
-                  <div class="col-sm-6">
+                  <label class="col-sm-4 control-label" >{{Objet parent}}</label>
+                  <div class="col-sm-8">
                       <select id="sel_object" class="eqLogicAttr form-control" data-l1key="object_id">
                           <option value="">{{Aucun}}</option>
   <?php
@@ -116,8 +119,8 @@ if (!isConnect('admin')) {
                  </div>
              </div>
              <div class="form-group">
-                  <label class="col-sm-3 control-label">{{Catégorie}}</label>
-                  <div class="col-sm-6">
+                  <label class="col-sm-4 control-label">{{Catégorie}}</label>
+                  <div class="col-sm-8">
                    <?php
                       foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
                       echo '<label class="checkbox-inline">';
@@ -128,28 +131,28 @@ if (!isConnect('admin')) {
                  </div>
              </div>
             <div class="form-group">
-              <label class="col-sm-3 control-label"></label>
-              <div class="col-sm-6">
+              <label class="col-sm-4 control-label"></label>
+              <div class="col-sm-8">
                 <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isEnable" checked/>{{Activer}}</label>
                 <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked/>{{Visible}}</label>
               </div>
             </div>
             <div style="display:<?php echo ($debug) ? 'block' : 'none'; ?>">
               <div class="form-group">
-                  <label class="col-sm-3 control-label">{{Identifiant Equipement}}</label>
-                  <div class="col-sm-6">
+                  <label class="col-sm-4 control-label">{{Identifiant Equipement}}</label>
+                  <div class="col-sm-8">
                       <input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="device_id"/>
                   </div>
               </div>
               <div class="form-group">
-                  <label class="col-sm-3 control-label">{{Type}}</label>
-                  <div class="col-sm-6">
+                  <label class="col-sm-4 control-label">{{Type}}</label>
+                  <div class="col-sm-8">
                       <input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="type"/>
                   </div>
               </div>
               <div class="form-group">
-                  <label class="col-sm-3 control-label">{{Equipements liés}}</label>
-                  <div class="col-sm-6">
+                  <label class="col-sm-4 control-label">{{Equipements liés}}</label>
+                  <div class="col-sm-8">
                       <input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="linked_devices"/>
                   </div>
               </div>
@@ -157,7 +160,21 @@ if (!isConnect('admin')) {
           </fieldset>
         </form>
       </div>
-      <legend class="col-lg-8"><i class="fa fa-link"></i> {{Equipements liés}}</legend>
+      <div class="col-lg-4">
+        <form class="form-horizontal">
+          <fieldset>
+            <div class="form-group">
+              <label class="control-label">{{Recharger les commandes}}</label>
+            </div>
+            <div class="form-group">
+              <a class="btn btn-danger bt_kringCreateCmd" dataCmdType="all">
+                <i class="fa fa-search"></i> {{Charger toutes les commandes}}
+              </a>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+      <legend class="col-lg-12"><i class="fa fa-link"></i> {{Equipements liés}}</legend>
       <div class="eqLogicThumbnailContainer col-lg-8" id="linkedDevices">
         <?php
         foreach ($eqLogics as $eqLogic) {

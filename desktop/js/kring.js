@@ -57,6 +57,9 @@
  });
 
  $(document).ready(function() {
+   $(".eqLogicAttr[data-l1key='id']").change(function(){
+     $("#eqLogic_img").attr('src',$(".eqLogicDisplayCard[data-eqLogic_id='"+$(this).val()+"'] img").first().attr('src'))
+   });
    $(".eqLogicAttr[data-l2key='linked_devices']").change(function(){
      $(".eqLogicThumbnailContainer#linkedDevices .eqLogicDisplayCard").hide();
      var linked_devices = $(this).val();
@@ -178,6 +181,77 @@ function askCode(username,password) {
              loadPage(url);
          }
      });
+ });
+
+ function kringCreateCmd(cmdType,force=0)
+ {
+   $.ajax({
+       type: "POST",
+       url: "plugins/kring/core/ajax/kring.ajax.php",
+       data: {
+           action: "createCmd",
+           id: $('.eqLogicAttr[data-l1key=id]').value(),
+           createcommand: force,
+           cmdType: cmdType
+       },
+       dataType: 'json',
+       global: false,
+       error: function (request, status, error) {
+           handleAjaxError(request, status, error);
+       },
+       success: function (data) {
+           if (data.state != 'ok') {
+               $('#div_alert').showAlert({message: data.result, level: 'danger'});
+               return;
+           }
+           $('#div_alert').showAlert({message: '{{Opération réalisée avec succès}}', level: 'success'});
+           $('.li_eqLogic[data-eqLogic_id=' + $('.eqLogicAttr[data-l1key=id]').value() + ']').click();
+       }
+   });
+ }
+
+ $('.bt_kringCreateCmd').on('click', function () {
+   var cmdType = $(this).attr("dataCmdType");
+   var dialog_title = '{{Recharge configuration}}';
+   var dialog_message = '<form class="form-horizontal onsubmit="return false;"> ';
+   dialog_title = '{{Recharger la configuration}}';
+   dialog_message += '<label class="control-label" > {{Sélectionner le mode de rechargement de la configuration}} </label> ' +
+   '<div> <div class="radio"> <label > ' +
+   '<input type="radio" name="command" id="command-0" value="0" checked="checked"> {{Sans recréer les commandes mais en créeant les manquantes}} </label> ' +
+   '</div><div class="radio"> <label > ' +
+   '<input type="radio" name="command" id="command-1" value="1"> {{En recréant les commandes}}</label> ' +
+   '</div> ' +
+   '</div><br>' +
+   '<label class="lbl lbl-warning" for="name">{{Attention, "en recréant les commandes" va supprimer les commandes existantes.}}</label> ';
+   dialog_message += '</form>';
+   bootbox.dialog({
+     title: dialog_title,
+     message: dialog_message,
+     buttons: {
+       "{{Annuler}}": {
+         className: "btn-danger",
+         callback: function () {}
+       },
+       success: {
+         label: "Démarrer",
+         className: "btn-success",
+         callback: function () {
+           createCommand = $("input[name='command']:checked").val();
+           if (createCommand == "1")
+           {
+             bootbox.confirm('{{Etes-vous sûr de vouloir récréer les commandes ? Cela va supprimer les commandes existantes}}', function (result) {
+               if (result) {
+                 kringCreateCmd(cmdType,force=1);
+               }
+             });
+           } else
+           {
+             kringCreateCmd(cmdType,force=0);
+           }
+         }
+       }
+     },
+   });
  });
 
  function addCmdToTable(_cmd) {
