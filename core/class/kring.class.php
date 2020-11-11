@@ -41,7 +41,8 @@ ini_set('display_errors', 'On');
  			'motions_enabled' => 'motion',
  			'ring' => 'ring',
  			'volume' => 'volume',
- 			'dnd' => 'dnd'
+ 			'dnd' => 'dnd',
+ 			'play_sound' => 'play_sound'
  		);
    /*     * *************************Attributs****************************** */
    private static $_client = null;
@@ -618,6 +619,14 @@ ini_set('display_errors', 'On');
      }
    }
 
+   public function play_sound($kind='ding')
+   {
+     log::add(__CLASS__, 'debug', $this->getLogicalId().' play_sound: '.$kind);
+     $device = $this->getDevice();
+     $device->playSound($kind);
+     $this->refreshWidget();
+   }
+
    /*     * **********************Getteur Setteur*************************** */
    public static function getClient()
    {
@@ -734,6 +743,9 @@ ini_set('display_errors', 'On');
       $eqLogic->setVolume($_options['slider']);
       $cmdGetVol = $eqLogic->getCmd('info', 'getVolume');
       $eqLogic->refresh_values();
+    } elseif ($this->getLogicalId() == 'play_sound') {
+      $kind = ($_options['select']=="0") ? 'motion' : 'ding';
+      $eqLogic->play_sound($kind);
     }
 
   }

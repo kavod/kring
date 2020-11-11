@@ -1,0 +1,14 @@
+{
+    "commands": [
+  			{
+  					"name": "Tester",
+  					"logicalId": "play_sound",
+  					"type": "action",
+  					"isVisible": 1,
+  					"subtype": "select",
+            "configuration": {
+              "listValue": "0|motion;1|ding"
+            }
+  			}
+    ]
+}
