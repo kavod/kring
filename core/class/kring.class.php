@@ -712,7 +712,7 @@ ini_set('display_errors', 'On');
 
   public function getSnapshot() {
     $device = $this->getDevice();
-    $root_path = '../../../../';
+    $root_path = __DIR__.'/../../../../';
     $res_path = 'plugins/'.__CLASS__.'/resources/';
     $relative_path = $res_path.$device->getVariable('id').'.jpg';
     $snap_path = $device->getSnapshot($root_path.$relative_path);
