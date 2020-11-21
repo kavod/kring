@@ -42,11 +42,23 @@
     $conf = array(
       "refresh_token" => config::byKey('refresh_token','kring')
     );
-    $client = new KRCPA\Clients\krcpaClient($conf);
-    $client->auth_refresh();
+    $client = new KRCPA\Clients\krcpaClient();
+    $client->auth_refresh($conf['refresh_token']);
+    $wait = 5;
     while (true)
     {
-      $dings = $client->getActiveDings();
+      try {
+        $dings = $client->getActiveDings();
+        $wait = 5;
+      } catch (\Exception $e) {
+        log::add(KRING_CLASS,'error',"Deamon: ".$e->getMessage());
+        $wait *= 2;
+        log::add(KRING_CLASS,'error',"Wait for $wait sec before retry");
+        sleep($wait);
+        continue;
+      }
+
+      // print_r($dings);
       foreach($dings as $ding)
       {
         log::add(KRING_CLASS, 'info', "Ding: ".print_r($ding,true));

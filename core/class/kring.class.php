@@ -97,29 +97,6 @@ ini_set('display_errors', 'On');
         	log::add(__CLASS__ . '_update','debug','Dependancy: KO');
           $return['state'] = 'nok';
         }
-        // if (class_exists('KRCPA\Clients\krcpaClient'))
-        // {
-        //   try
-        //   {
-        //     if (version_compare(KRCPA\Clients\krcpaClient::getVersion(),KRCPA_MIN_VERSION,'<'))
-        //     {
-        //       log::add(__CLASS__,'error',
-        //       __('Nouvelle version des dépendance requise. Merci de réinstaller les dépendances de kring',__FILE__)
-  			// 			);
-        //       $return['state'] = 'nok';
-        //     } else {
-        //       $return['state'] = 'ok';
-        //     }
-  			// 	}
-  			// 	catch (Exception $e)
-  			// 	{
-  		  //  		$return['state'] = 'nok';
-  			// 	}
-        // } else
-        // {
-        //   $return['state'] = 'nok';
-        // }
-        //log::add(__CLASS__,'debug','Dependancy_info: '.print_r($return,true));
      		return $return;
     }
 
@@ -151,11 +128,14 @@ ini_set('display_errors', 'On');
   		}
       if (self::getClient() != null)
       {
-        if (self::$_client->isAuth())
-        {
+        try {
+          self::$_client->getDevices();
           $return['launchable'] = 'ok';
-        } else {
-          log::add(__CLASS__, 'error', 'Lancement démon : authentification en échec ');
+        } catch(\Exception $e)
+        {
+          log::add(__CLASS__, 'error', 'Lancement démon : '.print_r($e,true));
+          $return['launchable_message'] = __('Echec de l\'authentification',__FILE__);
+          $return['launchable'] = 'nok';
         }
       } else {
         log::add(__CLASS__, 'error', 'Lancement démon : impossible de trouver le client');
