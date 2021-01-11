@@ -595,6 +595,13 @@ ini_set('display_errors', 'On');
         $changed = $this->setInfo('getVolume',$device->getVolume()) || $changed;
      }
 
+     // Battery update
+     $battery_life = $device->getVariable('battery_life',-1);
+     if ($battery_life>-1)
+     {
+       $this->batteryStatus($battery_life);
+     }
+
      if ($changed) {
        $this->refreshWidget();
      }
