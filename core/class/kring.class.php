@@ -49,6 +49,8 @@ ini_set('display_errors', 'On');
    private static $_client = null;
    private static $KRING_DEAMON = __CLASS__.'.deamon.php';
    private static $KRING_DEAMON_PATH = KRING_RES_PATH.'/'.__CLASS__.'.deamon.php';
+   private static $ROOT_PATH = __DIR__.'/../../../../';
+   private static $RES_PATH = 'plugins/'.__CLASS__.'/resources/';
 
    private $_device = null;
    //private static $KRING_DEAMON_PATH = KRING_RES_PATH.'/kring.deamon.php';
@@ -706,13 +708,48 @@ ini_set('display_errors', 'On');
     return $device->setVolume($vol);
   }
 
-  public function getSnapshot() {
+  public function getSnapPath() {
     $device = $this->getDevice();
-    $root_path = __DIR__.'/../../../../';
-    $res_path = 'plugins/'.__CLASS__.'/resources/';
-    $relative_path = $res_path.$device->getVariable('id').'.jpg';
-    $snap_path = $device->getSnapshot($root_path.$relative_path);
+    return self::$RES_PATH.$device->getVariable('id');
+  }
+
+  public function getSnapshot($event='onDemand') {
+    $device = $this->getDevice();
+    // $root_path = __DIR__.'/../../../../';
+    // $res_path = 'plugins/'.__CLASS__.'/resources/';
+    $relative_path = sprintf(
+      '%s/%s_%s.jpg',
+      $this->getSnapPath(),
+      date('U'),
+      $event
+    );
+    //$relative_path = $res_path.$device->getVariable('id').'/'.date('U').'_'.$event.'.jpg';
+    $snap_path = $device->getSnapshot(self::$ROOT_PATH.$relative_path);
     $this->setInfo('snapshot',$relative_path);
+  }
+
+  public function getSnapshotList()
+  {
+    $path = self::$ROOT_PATH.$this->getSnapPath();
+    if (!file_exists($path))
+      mkdir($path);
+    $files = scandir($path);
+    $result = array();
+    foreach($files as $file_path)
+    {
+      if (substr($file_path,0,1)=='.')
+        continue;
+      $file_path = $dir.DIRECTORY_SEPARATOR.$file_path;
+      if (preg_match('/(\d+)_(\d+)\.jpg',$file_path,$matches))
+      {
+        $result[] = array(
+          'device' => $device->getVariable('id'),
+          'timestamp' => $matches[1],
+          'event' => $matches[2],
+          'file_path' => $file_path
+        );
+      }
+    }
   }
  }
 

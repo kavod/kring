@@ -88,6 +88,7 @@ if (!isConnect('admin')) {
       <li role="presentation"><a href="#" class="eqLogicAction" aria-controls="home" role="tab" data-toggle="tab" data-action="returnToThumbnailDisplay"><i class="fa fa-arrow-circle-left"></i></a></li>
       <li role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fa fa-tachometer"></i> {{Equipement}}</a></li>
       <li role="presentation"><a href="#commandtab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fa fa-list-alt"></i> {{Commandes}}</a></li>
+      <li role="presentation"><a href="#snaptab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fa fa-list-alt"></i> {{Captures}}</a></li>
     </ul>
     <div class="tab-content" style="height:calc(100% - 50px);overflow:auto;overflow-x: hidden;">
       <div role="tabpanel" class="tab-pane active" id="eqlogictab">
@@ -102,6 +103,7 @@ if (!isConnect('admin')) {
                   <label class="col-sm-4 control-label">{{Nom de l'équipement}}</label>
                   <div class="col-sm-8">
                       <input type="text" class="eqLogicAttr form-control" data-l1key="id" style="display : none;" />
+                      <input type="text" class="eqLogicAttr form-control" data-l1key="logicalId" style="display : none;" />
                       <input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom de l'équipement}}"/>
                   </div>
               </div>
@@ -197,6 +199,22 @@ if (!isConnect('admin')) {
             <th>{{Type}}</th>
             <th>{{Paramètres}}</th>
             <th>{{Options}}</th>
+            <th>{{Action}}</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="snaptab">
+      <a class="btn btn-success btn-sm snapAction pull-right" data-action="add" style="margin-top:5px;"><i class="fa fa-camera"></i> {{Nouvelle capture}}</a><br/><br/>
+      <table id="table_snap" class="table table-bordered table-condensed">
+        <thead>
+          <tr>
+            <th>{{Aperçu}}</th>
+            <th>{{Equipement}}</th>
+            <th>{{Date - Heure}}</th>
+            <th>{{Evènement}}</th>
             <th>{{Action}}</th>
           </tr>
         </thead>

@@ -68,6 +68,11 @@
         ajax::error(__("Erreur durant l'ajout des commandes",__FILE__));
       else
         ajax::success("Cool");
+    } elseif(init('action') == 'getSnapshotList') {
+      $id = init('logicalId');
+      $device = eqLogic::byLogicalId($id);
+      $snapshots = $device->getSnapshotList();
+      ajax::success($snapshots);
     }
     throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
     /*     * *********Catch exeption*************** */

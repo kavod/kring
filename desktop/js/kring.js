@@ -58,7 +58,10 @@
 
  $(document).ready(function() {
    $(".eqLogicAttr[data-l1key='id']").change(function(){
-     $("#eqLogic_img").attr('src',$(".eqLogicDisplayCard[data-eqLogic_id='"+$(this).val()+"'] img").first().attr('src'))
+     $("#eqLogic_img").attr('src',$(".eqLogicDisplayCard[data-eqLogic_id='"+$(this).val()+"'] img").first().attr('src'));
+   });
+   $(".eqLogicAttr[data-l1key='logicalId']").change(function(){
+     getSnapshotList($(this).val());
    });
    $(".eqLogicAttr[data-l2key='linked_devices']").change(function(){
      $(".eqLogicThumbnailContainer#linkedDevices .eqLogicDisplayCard").hide();
@@ -71,6 +74,28 @@
      }
    });
  });
+
+function getSnapshotList(logicalId) {
+
+  $.ajax({// fonction permettant de faire de l'ajax
+      type: "POST", // methode de transmission des données au fichier php
+      url: "plugins/kring/core/ajax/kring.ajax.php", // url du fichier php
+      data: {
+          action: "getSnapshotList",
+          logicalId: logicalId
+      },
+      dataType: 'json',
+      error: function (request, status, error) {
+          handleAjaxError(request, status, error);
+      },
+      success: function (data) { // si l'appel a bien fonctionné
+          if (data.state != 'ok') {
+              $('#div_alert').showAlert({message: data.result, level: 'danger'});
+              return;
+          }
+        }
+  });
+}
 
 function askCode(username,password) {
      $.ajax({// fonction permettant de faire de l'ajax
