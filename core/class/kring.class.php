@@ -204,6 +204,15 @@ ini_set('display_errors', 'On');
 
   		}
     }
+
+    public static function cronHourly() {
+      self::cronExec();
+    }
+
+    public static function cronExec() {
+      log::add(__CLASS__ ,'debug','[Global] Cron Execution');
+      $this->refresh_values();
+    }
     /*     * -----------------------   Others   ---------------------------- */
 
     public static function syncDevices()
