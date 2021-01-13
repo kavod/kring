@@ -741,11 +741,15 @@ ini_set('display_errors', 'On');
         continue;
       if (preg_match('/(\d+)_(\w+)\.jpg/',$file_path,$matches))
       {
+        $imageData = base64_encode(file_get_contents($path.'/'.$file_path));
+        $src = 'data: '.mime_content_type($path.'/'.$file_path).';base64,'.$imageData;
         $result[] = array(
+          'deviceName' => $this->getName(),
           'device' => $this->getLogicalId(),
           'timestamp' => $matches[1],
           'event' => $matches[2],
-          'file_path' => $file_path
+          'file_path' => $this->getSnapPath()."/".$file_path,
+          'imageData' => $src
         );
       }
     }
