@@ -739,17 +739,17 @@ ini_set('display_errors', 'On');
     {
       if (substr($file_path,0,1)=='.')
         continue;
-      $file_path = $dir.DIRECTORY_SEPARATOR.$file_path;
-      if (preg_match('/(\d+)_(\d+)\.jpg',$file_path,$matches))
+      if (preg_match('/(\d+)_(\w+)\.jpg/',$file_path,$matches))
       {
         $result[] = array(
-          'device' => $device->getVariable('id'),
+          'device' => $this->getLogicalId(),
           'timestamp' => $matches[1],
           'event' => $matches[2],
           'file_path' => $file_path
         );
       }
     }
+    return $result;
   }
  }
 

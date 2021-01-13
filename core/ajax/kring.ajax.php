@@ -70,9 +70,14 @@
         ajax::success("Cool");
     } elseif(init('action') == 'getSnapshotList') {
       $id = init('logicalId');
-      $device = eqLogic::byLogicalId($id);
-      $snapshots = $device->getSnapshotList();
-      ajax::success($snapshots);
+      log::add('kring','debug',"[AJAX] getSnapshotList ".$id);
+      if($device = eqLogic::byLogicalId($id,'kring'))
+      {
+        $snapshots = $device->getSnapshotList();
+        ajax::success(json_encode($snapshots));
+      } else {
+        ajax::error(__("Equipement inconnu : ",__FILE__).$id);
+      }
     }
     throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
     /*     * *********Catch exeption*************** */

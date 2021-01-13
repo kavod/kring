@@ -61,7 +61,10 @@
      $("#eqLogic_img").attr('src',$(".eqLogicDisplayCard[data-eqLogic_id='"+$(this).val()+"'] img").first().attr('src'));
    });
    $(".eqLogicAttr[data-l1key='logicalId']").change(function(){
-     getSnapshotList($(this).val());
+     if ($(this).val()!='')
+     {
+       getSnapshotList($(this).val()); 
+     }
    });
    $(".eqLogicAttr[data-l2key='linked_devices']").change(function(){
      $(".eqLogicThumbnailContainer#linkedDevices .eqLogicDisplayCard").hide();
