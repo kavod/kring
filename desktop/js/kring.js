@@ -63,7 +63,7 @@
    $(".eqLogicAttr[data-l1key='logicalId']").change(function(){
      if ($(this).val()!='')
      {
-       $('#table_snap tbody').remove();
+       $('#table_snap tbody').empty();
        getSnapshotList($(this).val());
      }
    });
