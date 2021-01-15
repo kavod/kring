@@ -63,6 +63,7 @@
    $(".eqLogicAttr[data-l1key='logicalId']").change(function(){
      if ($(this).val()!='')
      {
+       $('#table_snap tbody').remove();
        getSnapshotList($(this).val());
      }
    });
@@ -79,7 +80,6 @@
  });
 
 function getSnapshotList(logicalId) {
-
   $.ajax({// fonction permettant de faire de l'ajax
       type: "POST", // methode de transmission des données au fichier php
       url: "plugins/kring/core/ajax/kring.ajax.php", // url du fichier php
