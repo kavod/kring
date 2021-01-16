@@ -108,7 +108,40 @@ function getSnapshotList(logicalId) {
              });
              $('#md_modal2').load('index.php?v=d&modal=widget.modal&data='+file_path+'&type=image').dialog('open');
            });
+
+           $('.snapAction').on('click', function() {
+             if ($(this).attr('data-action') == 'remove')
+             {
+               tr = $(this).closest("tr");
+               logicalId = $(".eqLogicAttr[data-l1key='logicalId']").val();
+               timestamp = tr.attr('data-timestamp');
+               deleteSnapshot(logicalId,timestamp);
+               tr.remove();
+             }
+           });
         }
+  });
+}
+
+function deleteSnapshot(logicalId,timestamp) {
+  $.ajax({
+      type: "POST",
+      url: "plugins/kring/core/ajax/kring.ajax.php",
+      data: {
+          action: "deleteSnapshot",
+          logicalId: logicalId,
+          timestamp: timestamp
+      },
+      dataType: 'json',
+      error: function (request, status, error) {
+          handleAjaxError(request, status, error);
+      },
+      success: function (data) {
+        if (data.state != 'ok') {
+            $('#div_alert').showAlert({message: data.result, level: 'danger'});
+            return;
+        }
+      }
   });
 }
 

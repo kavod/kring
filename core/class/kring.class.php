@@ -715,7 +715,10 @@ ini_set('display_errors', 'On');
 
   public function getSnapPath() {
     $device = $this->getDevice();
-    return self::$RES_PATH.$device->getVariable('id');
+    $path = self::$RES_PATH.$device->getVariable('id');
+    if (!file_exists(self::$ROOT_PATH.$path))
+      mkdir(self::$ROOT_PATH.$path);
+    return $path;
   }
 
   public function getSnapshot($event='onDemand') {
@@ -736,8 +739,6 @@ ini_set('display_errors', 'On');
   public function getSnapshotList()
   {
     $path = self::$ROOT_PATH.$this->getSnapPath();
-    if (!file_exists($path))
-      mkdir($path);
     $files = scandir($path);
     $result = array();
     foreach($files as $file_path)
@@ -759,6 +760,25 @@ ini_set('display_errors', 'On');
       }
     }
     return $result;
+  }
+
+  public function deleteSnapshot($_timestamp)
+  {
+    $path = self::$ROOT_PATH.$this->getSnapPath();
+    $files = scandir($path);
+    $result = array();
+    foreach($files as $file_path)
+    {
+      if (substr($file_path,0,1)=='.')
+        continue;
+      if (preg_match('/(\d+)_(\w+)\.jpg/',$file_path,$matches))
+      {
+        if ($matches[1]==$_timestamp)
+        {
+          unlink(self::$ROOT_PATH.$this->getSnapPath()."/".$file_path);
+        }
+      }
+    }
   }
  }
 

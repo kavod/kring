@@ -78,6 +78,13 @@
       } else {
         ajax::error(__("Equipement inconnu : ",__FILE__).$id);
       }
+    } elseif(init('action') == 'deleteSnapshot') {
+      $id = init('logicalId');
+      $timestamp = init('timestamp');
+      log::add('kring','debug',"[AJAX] deleteSnapshot ".$id);
+      $device = eqLogic::byLogicalId($id,'kring');
+      $device->deleteSnapshot($timestamp);
+      ajax::success();
     }
     throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
     /*     * *********Catch exeption*************** */
