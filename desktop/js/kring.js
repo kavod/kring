@@ -64,28 +64,15 @@
      logicalId = $(this).val();
      if ($(this).val()!='')
      {
-       $('.snapAction').on('click', function() {
-         if ($(this).attr('data-action') == 'add')
-         {
-           $.ajax({// fonction permettant de faire de l'ajax
-               type: "POST", // methode de transmission des données au fichier php
-               url: "plugins/kring/core/ajax/kring.ajax.php", // url du fichier php
-               data: {
-                   action: "newSnapshot",
-                   logicalId: logicalId
-               },
-               dataType: 'json',
-               error: function (request, status, error) {
-                   handleAjaxError(request, status, error);
-               },
-               success: function (data) { // si l'appel a bien fonctionné
-                 if (data.state != 'ok') {
-                     $('#div_alert').showAlert({message: data.result, level: 'danger'});
-                     return;
-                 }
-                 refreshSnapshots(logicalId);
-               }
-           });
+       $('.snapsAction').on('click', function() {
+         if ($(this).attr('data-action') == 'add') {
+           newSnapshot(logicalId);
+         }
+         else if ($(this).attr('data-action') == 'refresh') {
+           refreshSnapshots(logicalId);
+         }
+         else if ($(this).attr('data-action') == 'deleteAll') {
+           deleteAllSnapshots(logicalId);
          }
        });
        refreshSnapshots(logicalId);
@@ -102,6 +89,58 @@
      }
    });
  });
+
+ function deleteAllSnapshots(logicalId) {
+    if (logicalId == 'undefined') {
+      logicalId = $(".eqLogicAttr[data-l1key='logicalId']").val();
+    }
+    $.ajax({
+        type: "POST",
+        url: "plugins/kring/core/ajax/kring.ajax.php",
+        data: {
+            action: "deleteAllSnapshots",
+            logicalId: logicalId
+        },
+        dataType: 'json',
+        error: function (request, status, error) {
+            handleAjaxError(request, status, error);
+        },
+        success: function (data) { // si l'appel a bien fonctionné
+          if (data.state != 'ok') {
+              $('#div_alert').showAlert({message: data.result, level: 'danger'});
+              return;
+          }
+          refreshSnapshots(logicalId);
+        }
+    });
+ }
+
+ function newSnapshot(logicalId)
+ {
+    if (logicalId == 'undefined') {
+      logicalId = $(".eqLogicAttr[data-l1key='logicalId']").val();
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "plugins/kring/core/ajax/kring.ajax.php",
+        data: {
+            action: "newSnapshot",
+            logicalId: logicalId
+        },
+        dataType: 'json',
+        error: function (request, status, error) {
+            handleAjaxError(request, status, error);
+        },
+        success: function (data) { // si l'appel a bien fonctionné
+          if (data.state != 'ok') {
+              $('#div_alert').showAlert({message: data.result, level: 'danger'});
+              return;
+          }
+          refreshSnapshots(logicalId);
+        }
+    });
+ }
 
  function refreshSnapshots(logicalId) {
    if (logicalId == 'undefined')
@@ -128,28 +167,34 @@ function getSnapshotList(logicalId) {
               return;
           }
           json = JSON.parse(data.result);
-          json.forEach(function(snap) {
-            addSnapToTable(snap);
-          });
-          $('.kringThumb').on('click', function() {
-            var file_path = $(this).attr('data-uri');
-            var datetime = $(this).attr('data-datetime');
-             $('#md_modal2').dialog({
-               title: datetime
+          if (json === null)
+          {
+            $("a[href='#snaptab']").closest('li').hide();
+          } else {
+            $("a[href='#snaptab']").closest('li').show();
+            json.forEach(function(snap) {
+              addSnapToTable(snap);
+            });
+            $('.kringThumb').on('click', function() {
+              var file_path = $(this).attr('data-uri');
+              var datetime = $(this).attr('data-datetime');
+               $('#md_modal2').dialog({
+                 title: datetime
+               });
+               $('#md_modal2').load('index.php?v=d&modal=widget.modal&data='+file_path+'&type=image').dialog('open');
              });
-             $('#md_modal2').load('index.php?v=d&modal=widget.modal&data='+file_path+'&type=image').dialog('open');
-           });
 
-           $('.snapAction').on('click', function() {
-             if ($(this).attr('data-action') == 'remove')
-             {
-               tr = $(this).closest("tr");
-               logicalId = $(".eqLogicAttr[data-l1key='logicalId']").val();
-               timestamp = tr.attr('data-timestamp');
-               deleteSnapshot(logicalId,timestamp);
-               tr.remove();
-             }
-           });
+             $('.snapAction').on('click', function() {
+               if ($(this).attr('data-action') == 'remove')
+               {
+                 tr = $(this).closest("tr");
+                 logicalId = $(".eqLogicAttr[data-l1key='logicalId']").val();
+                 timestamp = tr.attr('data-timestamp');
+                 deleteSnapshot(logicalId,timestamp);
+                 tr.remove();
+               }
+             });
+          }
         }
   });
 }
@@ -360,7 +405,7 @@ function askCode(username,password) {
 
  function addSnapToTable(_snap)
  {
-   let datetime = new Date(parseInt(_snap.timestamp));
+   let datetime = new Date(parseInt(init(_snap.timestamp)));
    var tr = '<tr data-timestamp="' + init(_snap.timestamp) + '">';
    tr += '<td>';
    tr += '<img src="' + _snap.imageData + '" alt="" class="kringThumb" data-uri="'+_snap.file_path+'" data-datetime="' + datetime.toString() + '"/>';

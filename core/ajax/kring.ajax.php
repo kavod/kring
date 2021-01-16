@@ -85,6 +85,12 @@
       $device = eqLogic::byLogicalId($id,'kring');
       $device->deleteSnapshot($timestamp);
       ajax::success();
+    } elseif(init('action') == 'deleteAllSnapshots') {
+      $id = init('logicalId');
+      log::add('kring','debug',"[AJAX] deleteAllSnapshots ".$id);
+      $device = eqLogic::byLogicalId($id,'kring');
+      $device->deleteSnapshot('all');
+      ajax::success();
     } elseif(init('action') == 'newSnapshot') {
       $id = init('logicalId');
       log::add('kring','debug',"[AJAX] newSnapshot");

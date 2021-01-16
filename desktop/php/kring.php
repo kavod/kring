@@ -207,7 +207,9 @@ if (!isConnect('admin')) {
       </table>
     </div>
     <div role="tabpanel" class="tab-pane" id="snaptab">
-      <a class="btn btn-success btn-sm snapAction pull-right" data-action="add" style="margin-top:5px;"><i class="fa fa-camera"></i> {{Nouvelle capture}}</a><br/><br/>
+      <a class="btn btn-success btn-sm snapsAction pull-right" data-action="add" style="margin-top:5px;"><i class="fa fa-camera"></i> {{Nouvelle capture}}</a>
+      <a class="btn btn-danger btn-sm snapsAction pull-right" data-action="deleteAll" style="margin-top:5px;"><i class="fa fa-delete"></i> {{Supprimer toutes}}</a>
+      <a class="btn btn-default btn-sm snapsAction pull-right" data-action="refresh" style="margin-top:5px;"><i class="fa fa-refresh"></i> {{Rafraichir}}</a><br/><br/>
       <table id="table_snap" class="table table-bordered table-condensed">
         <thead>
           <tr>

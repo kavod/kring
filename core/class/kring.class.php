@@ -714,68 +714,83 @@ ini_set('display_errors', 'On');
   }
 
   public function getSnapPath() {
-    $device = $this->getDevice();
-    $path = self::$RES_PATH.$device->getVariable('id');
-    if (!file_exists(self::$ROOT_PATH.$path))
-      mkdir(self::$ROOT_PATH.$path);
-    return $path;
+    if ($this->is_featured('snapshots'))
+    {
+      $device = $this->getDevice();
+      $path = self::$RES_PATH.$device->getVariable('id');
+      if (!file_exists(self::$ROOT_PATH.$path))
+        mkdir(self::$ROOT_PATH.$path);
+      return $path;
+    }
+    return '';
   }
 
   public function getSnapshot($event='onDemand') {
-    $device = $this->getDevice();
-    // $root_path = __DIR__.'/../../../../';
-    // $res_path = 'plugins/'.__CLASS__.'/resources/';
-    $relative_path = sprintf(
-      '%s/%s_%s.jpg',
-      $this->getSnapPath(),
-      date('U'),
-      $event
-    );
-    //$relative_path = $res_path.$device->getVariable('id').'/'.date('U').'_'.$event.'.jpg';
-    $snap_path = $device->getSnapshot(self::$ROOT_PATH.$relative_path);
-    $this->setInfo('snapshot',$relative_path);
+    if ($this->is_featured('snapshots'))
+    {
+      $device = $this->getDevice();
+      // $root_path = __DIR__.'/../../../../';
+      // $res_path = 'plugins/'.__CLASS__.'/resources/';
+      $relative_path = sprintf(
+        '%s/%s_%s.jpg',
+        $this->getSnapPath(),
+        date('U'),
+        $event
+      );
+      //$relative_path = $res_path.$device->getVariable('id').'/'.date('U').'_'.$event.'.jpg';
+      $snap_path = $device->getSnapshot(self::$ROOT_PATH.$relative_path);
+      $this->setInfo('snapshot',$relative_path);
+    }
   }
 
   public function getSnapshotList()
   {
-    $path = self::$ROOT_PATH.$this->getSnapPath();
-    $files = scandir($path);
-    $result = array();
-    foreach($files as $file_path)
+    if ($this->is_featured('snapshots'))
     {
-      if (substr($file_path,0,1)=='.')
-        continue;
-      if (preg_match('/(\d+)_(\w+)\.jpg/',$file_path,$matches))
+      $result = array();
+      $path = self::$ROOT_PATH.$this->getSnapPath();
+      $files = scandir($path);
+      foreach($files as $file_path)
       {
-        $imageData = base64_encode(file_get_contents($path.'/'.$file_path));
-        $src = 'data: '.mime_content_type($path.'/'.$file_path).';base64,'.$imageData;
-        $result[] = array(
-          'deviceName' => $this->getName(),
-          'device' => $this->getLogicalId(),
-          'timestamp' => $matches[1],
-          'event' => $matches[2],
-          'file_path' => $this->getSnapPath()."/".$file_path,
-          'imageData' => $src
-        );
+        if (substr($file_path,0,1)=='.')
+          continue;
+        if (preg_match('/(\d+)_(\w+)\.jpg/',$file_path,$matches))
+        {
+          $imageData = base64_encode(file_get_contents($path.'/'.$file_path));
+          $src = 'data: '.mime_content_type($path.'/'.$file_path).';base64,'.$imageData;
+          $result[] = array(
+            'deviceName' => $this->getName(),
+            'device' => $this->getLogicalId(),
+            'timestamp' => $matches[1],
+            'event' => $matches[2],
+            'file_path' => $this->getSnapPath()."/".$file_path,
+            'imageData' => $src
+          );
+        }
       }
+      return $result;
+    } else {
+      return null;
     }
-    return $result;
   }
 
   public function deleteSnapshot($_timestamp)
   {
-    $path = self::$ROOT_PATH.$this->getSnapPath();
-    $files = scandir($path);
-    $result = array();
-    foreach($files as $file_path)
+    if ($this->is_featured('snapshots'))
     {
-      if (substr($file_path,0,1)=='.')
-        continue;
-      if (preg_match('/(\d+)_(\w+)\.jpg/',$file_path,$matches))
+      $path = self::$ROOT_PATH.$this->getSnapPath();
+      $files = scandir($path);
+      $result = array();
+      foreach($files as $file_path)
       {
-        if ($matches[1]==$_timestamp)
+        if (substr($file_path,0,1)=='.')
+          continue;
+        if (preg_match('/(\d+)_(\w+)\.jpg/',$file_path,$matches))
         {
-          unlink(self::$ROOT_PATH.$this->getSnapPath()."/".$file_path);
+          if ($_timestamp = 'all' || $matches[1]==$_timestamp)
+          {
+            unlink(self::$ROOT_PATH.$this->getSnapPath()."/".$file_path);
+          }
         }
       }
     }
