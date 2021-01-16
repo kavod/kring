@@ -405,7 +405,7 @@ function askCode(username,password) {
 
  function addSnapToTable(_snap)
  {
-   let datetime = new Date(parseInt(init(_snap.timestamp)));
+   let datetime = new Date(parseInt(init(_snap.timestamp))*1000);
    var tr = '<tr data-timestamp="' + init(_snap.timestamp) + '">';
    tr += '<td>';
    tr += '<img src="' + _snap.imageData + '" alt="" class="kringThumb" data-uri="'+_snap.file_path+'" data-datetime="' + datetime.toString() + '"/>';
