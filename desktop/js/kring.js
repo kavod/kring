@@ -61,10 +61,34 @@
      $("#eqLogic_img").attr('src',$(".eqLogicDisplayCard[data-eqLogic_id='"+$(this).val()+"'] img").first().attr('src'));
    });
    $(".eqLogicAttr[data-l1key='logicalId']").change(function(){
+     logicalId = $(this).val();
      if ($(this).val()!='')
      {
-       $('#table_snap tbody').empty();
-       getSnapshotList($(this).val());
+       $('.snapAction').on('click', function() {
+         if ($(this).attr('data-action') == 'add')
+         {
+           $.ajax({// fonction permettant de faire de l'ajax
+               type: "POST", // methode de transmission des données au fichier php
+               url: "plugins/kring/core/ajax/kring.ajax.php", // url du fichier php
+               data: {
+                   action: "newSnapshot",
+                   logicalId: logicalId
+               },
+               dataType: 'json',
+               error: function (request, status, error) {
+                   handleAjaxError(request, status, error);
+               },
+               success: function (data) { // si l'appel a bien fonctionné
+                 if (data.state != 'ok') {
+                     $('#div_alert').showAlert({message: data.result, level: 'danger'});
+                     return;
+                 }
+                 refreshSnapshots(logicalId);
+               }
+           });
+         }
+       });
+       refreshSnapshots(logicalId);
      }
    });
    $(".eqLogicAttr[data-l2key='linked_devices']").change(function(){
@@ -78,6 +102,13 @@
      }
    });
  });
+
+ function refreshSnapshots(logicalId) {
+   if (logicalId == 'undefined')
+    logicalId = $(".eqLogicAttr[data-l1key='logicalId']").val();
+   $('#table_snap tbody').empty();
+   getSnapshotList(logicalId);
+ }
 
 function getSnapshotList(logicalId) {
   $.ajax({// fonction permettant de faire de l'ajax

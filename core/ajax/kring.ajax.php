@@ -85,6 +85,12 @@
       $device = eqLogic::byLogicalId($id,'kring');
       $device->deleteSnapshot($timestamp);
       ajax::success();
+    } elseif(init('action') == 'newSnapshot') {
+      $id = init('logicalId');
+      log::add('kring','debug',"[AJAX] newSnapshot");
+      $device = eqLogic::byLogicalId($id,'kring');
+      $device->getSnapshot('onDemand');
+      ajax::success();
     }
     throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
     /*     * *********Catch exeption*************** */
