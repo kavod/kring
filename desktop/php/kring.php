@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
- error_reporting(-1);
- ini_set('display_errors', 'On');
+ // error_reporting(-1);
+ // ini_set('display_errors', 'On');
 
 if (!isConnect('admin')) {
     throw new Exception('{{401 - Accès non autorisé}}');
@@ -29,6 +29,7 @@ if (!isConnect('admin')) {
  $eqLogics = eqLogic::byType($plugin->getId());
 
  $debug = (intval(log::getLogLevel('kring')) <=100);
+ sendVarToJS('kringDebug', $debug);
  ?>
 
 <div class="row row-overflow">
@@ -139,26 +140,72 @@ if (!isConnect('admin')) {
                 <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked/>{{Visible}}</label>
               </div>
             </div>
-            <div style="display:<?php echo ($debug) ? 'block' : 'none'; ?>">
-              <div class="form-group">
-                  <label class="col-sm-4 control-label">{{Identifiant Equipement}}</label>
-                  <div class="col-sm-8">
-                      <input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="device_id"/>
-                  </div>
-              </div>
-              <div class="form-group">
-                  <label class="col-sm-4 control-label">{{Type}}</label>
-                  <div class="col-sm-8">
-                      <input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="type"/>
-                  </div>
-              </div>
-              <div class="form-group">
-                  <label class="col-sm-4 control-label">{{Equipements liés}}</label>
-                  <div class="col-sm-8">
-                      <input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="linked_devices"/>
-                  </div>
-              </div>
-      			</div>
+            <div class="form-group">
+                <label class="col-sm-4 control-label"></label>
+                <div class="col-sm-8">
+                  <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="snapOnRing" checked/>{{Capture auto lors d'une sonnette}}</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-4 control-label"></label>
+                <div class="col-sm-8">
+                  <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="snapOnMotion" checked/>{{Capture auto lors d'un mouvement}}</label>
+                </div>
+            </div>
+            <div class="form-group kringDebug">
+                <label class="col-sm-4 control-label">{{Identifiant Equipement}}</label>
+                <div class="col-sm-8">
+                    <input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="device_id"/>
+                </div>
+            </div>
+            <div class="form-group kringDebug">
+                <label class="col-sm-4 control-label">{{Type}}</label>
+                <div class="col-sm-8">
+                    <input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="type"/>
+                </div>
+            </div>
+            <div class="form-group kringDebug">
+                <label class="col-sm-4 control-label">{{Equipements liés}}</label>
+                <div class="col-sm-8">
+                    <input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="linked_devices"/>
+                </div>
+            </div>
+            <div class="form-group kringDebug">
+                <label class="col-sm-4 control-label"></label>
+                <div class="col-sm-8">
+                  <label class="checkbox-inline"><input disabled type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="featured_motions_enabled" checked/>{{Featured: Mouvement}}</label>
+                </div>
+            </div>
+            <div class="form-group kringDebug">
+                <label class="col-sm-4 control-label"></label>
+                <div class="col-sm-8">
+                  <label class="checkbox-inline"><input disabled type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="featured_ring" checked/>{{Featured: Sonnette}}</label>
+                </div>
+            </div>
+            <div class="form-group kringDebug">
+                <label class="col-sm-4 control-label"></label>
+                <div class="col-sm-8">
+                  <label class="checkbox-inline"><input disabled type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="featured_volume" checked/>{{Featured: Volume}}</label>
+                </div>
+            </div>
+            <div class="form-group kringDebug">
+                <label class="col-sm-4 control-label"></label>
+                <div class="col-sm-8">
+                  <label class="checkbox-inline"><input disabled type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="featured_dnd" checked/>{{Featured: Ne pas déranger}}</label>
+                </div>
+            </div>
+            <div class="form-group kringDebug">
+                <label class="col-sm-4 control-label"></label>
+                <div class="col-sm-8">
+                  <label class="checkbox-inline"><input disabled type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="featured_play_sound" checked/>{{Featured: Jouer son}}</label>
+                </div>
+            </div>
+            <div class="form-group kringDebug">
+                <label class="col-sm-4 control-label"></label>
+                <div class="col-sm-8">
+                  <label class="checkbox-inline"><input disabled type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="featured_snapshots" checked/>{{Featured: Captures}}</label>
+                </div>
+            </div>
           </fieldset>
         </form>
       </div>

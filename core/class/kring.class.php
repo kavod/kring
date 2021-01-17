@@ -261,12 +261,18 @@ ini_set('display_errors', 'On');
   						$eqLogic->setConfiguration('device_id', $device_id);
               log::add(__CLASS__, 'debug', "Adding eqLogic $id setConfiguration('type', $kind)");
   						$eqLogic->setConfiguration('type', $kind);
+              foreach(self::FEATURES as $feature => $cmdType)
+              {
+                $eqLogic->setConfiguration('featured_'.$feature, (int)$device->is_featured($feature));
+              }
+              $eqLogic->setConfiguration('snapOnRing', $device->is_featured('ring') && $device->is_featured('snapshots'));
+              $eqLogic->setConfiguration('snapOnMotion', 0);
               log::add(__CLASS__, 'debug', "Adding eqLogic $id setEqType_name(".__CLASS__.")");
   	  				$eqLogic->setEqType_name(__CLASS__);
               log::add(__CLASS__, 'debug', "Adding eqLogic $id setIsVisible(0)");
-  	  				$eqLogic->setIsVisible(0);
+  	  				$eqLogic->setIsVisible(1);
               log::add(__CLASS__, 'debug', "Adding eqLogic $id setIsEnable(0)");
-  	  				$eqLogic->setIsEnable(0);
+  	  				$eqLogic->setIsEnable(1);
               log::add(__CLASS__, 'debug', 'Adding eqLogic: '.print_r($eqLogic,true));
   	  				$eqLogic->save();
   						$nb_devices++;
@@ -319,14 +325,18 @@ ini_set('display_errors', 'On');
   						$eqLogic->setConfiguration('device_id', $device_id);
               log::add(__CLASS__, 'debug', "Adding eqLogic $id setConfiguration('type', $kind)");
   						$eqLogic->setConfiguration('type', $kind);
-              // log::add(__CLASS__, 'debug', "Adding eqLogic $id setConfiguration('linked_devices', $linkedDoorbells)");
-  						// $eqLogic->setConfiguration('linked_devices', $linkedDoorbells);
+              foreach(self::FEATURES as $feature => $cmdType)
+              {
+                $eqLogic->setConfiguration('featured_'.$feature, (int)$device->is_featured($feature));
+              }
+              $eqLogic->setConfiguration('snapOnRing', $device->is_featured('ring') && $device->is_featured('snapshots'));
+              $eqLogic->setConfiguration('snapOnMotion', 0);
               log::add(__CLASS__, 'debug', "Adding eqLogic $id setEqType_name(".__CLASS__.")");
   	  				$eqLogic->setEqType_name(__CLASS__);
               log::add(__CLASS__, 'debug', "Adding eqLogic $id setIsVisible(0)");
-  	  				$eqLogic->setIsVisible(0);
+  	  				$eqLogic->setIsVisible(1);
               log::add(__CLASS__, 'debug', "Adding eqLogic $id setIsEnable(0)");
-  	  				$eqLogic->setIsEnable(0);
+  	  				$eqLogic->setIsEnable(1);
               log::add(__CLASS__, 'debug', 'Adding eqLogic: '.print_r($eqLogic,true));
   	  				$eqLogic->save();
   						$nb_devices++;

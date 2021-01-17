@@ -57,6 +57,11 @@
  });
 
  $(document).ready(function() {
+   if (kringDebug) {
+     $(".kringDebug").show();
+   } else {
+     $(".kringDebug").hide();
+   }
    $(".eqLogicAttr[data-l1key='id']").change(function(){
      $("#eqLogic_img").attr('src',$(".eqLogicDisplayCard[data-eqLogic_id='"+$(this).val()+"'] img").first().attr('src'));
    });
@@ -76,6 +81,25 @@
          }
        });
        refreshSnapshots(logicalId);
+     }
+   });
+   var str_snap = ".eqLogicAttr[data-l2key='featured_snapshots']";
+   var str_motion = ".eqLogicAttr[data-l2key='featured_motions_enabled']";
+   var str_ring = ".eqLogicAttr[data-l2key='featured_ring']";
+   $(str_snap+","+str_motion).change(function(){
+     if ($(str_snap).prop('checked') && $(str_motion).prop('checked'))
+     {
+       $(".eqLogicAttr[data-l2key='snapOnMotion']").closest(".form-group").show();
+     } else {
+       $(".eqLogicAttr[data-l2key='snapOnMotion']").closest(".form-group").hide();
+     }
+   });
+   $(str_snap+","+str_ring).change(function(){
+     if ($(str_snap).prop("checked") && $(str_ring).prop("checked"))
+     {
+       $(".eqLogicAttr[data-l2key='snapOnRing']").closest(".form-group").show();
+     } else {
+       $(".eqLogicAttr[data-l2key='snapOnRing']").closest(".form-group").hide();
      }
    });
    $(".eqLogicAttr[data-l2key='linked_devices']").change(function(){
