@@ -21,11 +21,16 @@
  require_once dirname(__FILE__) . '/../core/php/kring.inc.php';
 
  function kring_install() {
-
+   $uuid = kring::guidv4();
+   config::save('uuid', $uuid,'kring');
  }
 
  function kring_update() {
-
+   if (config::byKey('uuid', 'kring','-1')=='-1')
+   {
+     $uuid = kring::guidv4();
+     config::save('uuid', $uuid,'kring');
+   }
  }
  function kring_remove() {
 

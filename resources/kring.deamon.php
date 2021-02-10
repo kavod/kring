@@ -37,6 +37,7 @@
   }
   pcntl_signal(SIGTERM, "rm_pidfile");
   pcntl_signal(SIGINT, "rm_pidfile");
+  $devices = array("doorbots"=>array());
   try
   {
     $conf = array(
@@ -44,6 +45,12 @@
     );
     $client = new KRCPA\Clients\krcpaClient();
     $client->auth_refresh($conf['refresh_token']);
+    $devices = $client->getDevices();
+    foreach($devices['doorbots'] as $device)
+    {
+      $device->subscribeMotion();
+      $device->subscribeRing();
+    }
     $wait = 5;
     while (true)
     {
@@ -67,9 +74,31 @@
         {
           if ($ding->getVariable('kind','')=='motion')
           {
+            echo date("Y-m-d H:i:s");
+            echo "Doorbot ".$ding->getVariable('doorbot_id').": Motion detected";
+            log::add(KRING_CLASS, 'debug', "Doorbot ".$ding->getVariable('doorbot_id').": Motion detected");
             $result = $eqLogic->setInfo('motion',1);
             if (!$result)
               log::add(KRING_CLASS, 'debug', "Doorbot ".$ding->getVariable('doorbot_id').": no motion cmd found");
+            if ($eqLogic->getConfiguration('snapOnMotion',false)==1)
+            {
+              echo date("Y-m-d H:i:s");
+              echo "Doorbot ".$ding->getVariable('doorbot_id').": Auto Snapshot";
+              log::add(KRING_CLASS, 'debug', "Doorbot ".$ding->getVariable('doorbot_id').": Auto Snapshot");
+              $eqLogic->getSnapshot('motion');
+            }
+          }
+          if ($ding->getVariable('kind','')=='ring')
+          {
+            log::add(KRING_CLASS, 'debug', "Doorbot ".$ding->getVariable('doorbot_id').": Ring detected");
+            $result = $eqLogic->setInfo('ring',1);
+            if (!$result)
+              log::add(KRING_CLASS, 'debug', "Doorbot ".$ding->getVariable('doorbot_id').": no ring cmd found");
+            if ($eqLogic->getConfiguration('snapOnRing',false)==1)
+            {
+              log::add(KRING_CLASS, 'debug', "Doorbot ".$ding->getVariable('doorbot_id').": Auto Snapshot");
+              $eqLogic->getSnapshot('ring');
+            }
           }
         } else {
           log::add(KRING_CLASS, 'error', "Id: ".$ding->getVariable('doorbot_id')." inconnu");
@@ -80,6 +109,11 @@
     }
   } catch(\Exception $e)
   {
+    foreach($devices['doorbots'] as $device)
+    {
+      $device->subscribeMotion();
+      $device->subscribeRing();
+    }
     rm_pidfile();
   }
 ?>
