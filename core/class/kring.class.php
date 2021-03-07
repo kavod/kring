@@ -82,7 +82,7 @@ ini_set('display_errors', 'On');
 
     public static function dependancy_info()
     {
-    	  log::add(__CLASS__ . '_update','debug','Checking dependancy');
+    	  log::add(__CLASS__ ,'debug','Checking dependancy');
     		$return = array();
     		$return['log'] = 'kring_update';
     		$return['progress_file'] =  jeedom::getTmpFolder('kring') . '/dependancy_kring_in_progress';
@@ -92,7 +92,7 @@ ini_set('display_errors', 'On');
             $return['state'] = 'ok';
           } else {
           	log::add(__CLASS__ . '_update','debug','Dependancy: KO');
-            $return['state'] = 'ko';
+            $return['state'] = 'nok';
           }
         } catch(kringException $e)
         {
