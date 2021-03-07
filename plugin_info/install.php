@@ -31,6 +31,29 @@
      $uuid = kring::guidv4();
      config::save('uuid', $uuid,'kring');
    }
+
+   $kring_version = config::byKey('version','kkasa','0.1');
+   log::add('kring', 'debug', "Update kring from ".$kring_version . " to ".KKASA_VERSION);
+   $plugin = plugin::ById('kkasa');
+   try {
+     $plugin->dependancy_install();
+   } catch (\Exception $e)
+   {
+     log::add('kring', 'error', "Error during dependancy install ".print_r($e,true));
+   }
+   $eqLogics = eqLogic::byType('kring');
+   $changed = false;
+
+   if (version_compare($kring_version,'0.2','<'))
+   {
+     foreach ($eqLogics as $eqLogic) {
+       if ($eqLogic->is_featured('snapshots')) {
+         $eqLogic->setConfiguration('maxSnapshots', 10);
+         $eqLogic->save();
+       }
+     }
+   }
+
  }
  function kring_remove() {
 

@@ -152,6 +152,12 @@ if (!isConnect('admin')) {
                   <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="snapOnMotion" checked/>{{Capture auto lors d'un mouvement}}</label>
                 </div>
             </div>
+            <div class="form-group kringFeatSnap">
+                <label class="col-sm-4 control-label">{{Nombre maximum de snapshots}}</label>
+                <div class="col-sm-8">
+                  <input class="eqLogicAttr configuration form-control" type="number" data-l1key="configuration" data-l2key="maxSnapshots" min="1" />
+                </div>
+            </div>
             <div class="form-group kringDebug">
                 <label class="col-sm-4 control-label">{{Identifiant Equipement}}</label>
                 <div class="col-sm-8">

@@ -19,8 +19,8 @@
  */
  error_reporting(-1);
  ini_set('display_errors', 'On');
- 
+
 require_once(__DIR__  . '/../../../../core/php/core.inc.php');
 
-define('KRING_VERSION','0.1');
+define('KRING_VERSION','0.2');
 ?>

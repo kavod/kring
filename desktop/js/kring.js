@@ -102,6 +102,14 @@
        $(".eqLogicAttr[data-l2key='snapOnRing']").closest(".form-group").hide();
      }
    });
+   $(str_snap).change(function() {
+     if ($(str_snap).prop("checked"))
+     {
+       $('.kringFeatSnap').show();
+     } else {
+       $('.kringFeatSnap').hide();
+     }
+   });
    $(".eqLogicAttr[data-l2key='linked_devices']").change(function(){
      $(".eqLogicThumbnailContainer#linkedDevices .eqLogicDisplayCard").hide();
      var linked_devices = $(this).val();

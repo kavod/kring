@@ -267,6 +267,7 @@ ini_set('display_errors', 'On');
               }
               $eqLogic->setConfiguration('snapOnRing', $device->is_featured('ring') && $device->is_featured('snapshots'));
               $eqLogic->setConfiguration('snapOnMotion', 0);
+              $eqLogic->setConfiguration('maxSnapshots', 10);
               log::add(__CLASS__, 'debug', "Adding eqLogic $id setEqType_name(".__CLASS__.")");
   	  				$eqLogic->setEqType_name(__CLASS__);
               log::add(__CLASS__, 'debug', "Adding eqLogic $id setIsVisible(0)");
@@ -752,17 +753,15 @@ ini_set('display_errors', 'On');
     if ($this->is_featured('snapshots'))
     {
       $device = $this->getDevice();
-      // $root_path = __DIR__.'/../../../../';
-      // $res_path = 'plugins/'.__CLASS__.'/resources/';
       $relative_path = sprintf(
         '%s/%s_%s.jpg',
         $this->getSnapPath(),
         date('U'),
         $event
       );
-      //$relative_path = $res_path.$device->getVariable('id').'/'.date('U').'_'.$event.'.jpg';
       $snap_path = $device->getSnapshot(self::$ROOT_PATH.$relative_path);
       $this->setInfo('snapshot',$relative_path);
+      $this->cleanSnapshots();
     }
   }
 
@@ -770,6 +769,7 @@ ini_set('display_errors', 'On');
   {
     if ($this->is_featured('snapshots'))
     {
+      log::add(__CLASS__,'debug','Get snapshots list');
       $result = array();
       $path = self::$ROOT_PATH.$this->getSnapPath();
       $files = scandir($path);
@@ -791,10 +791,41 @@ ini_set('display_errors', 'On');
           );
         }
       }
+      log::add(__CLASS__,'debug',count($result).' snapshots found');
       return $result;
     } else {
       return null;
     }
+  }
+
+  public function getOlderSnapshots($number_to_keep=-1)
+  {
+    if ($number_to_keep==-1)// unlimited
+      return array();
+    $list = $this->getSnapshotList();
+    usort($list,function($a,$b) {
+      return $b['timestamp'] - $a['timestamp'];
+    });
+    $result = array_slice($list,$number_to_keep);
+    log::add(__CLASS__,'debug',count($result).' snapshots to be removed');
+    return $result;
+  }
+
+  public function cleanOlderSnapshots($number_to_keep=-1)
+  {
+    $list = $this->getOlderSnapshots($number_to_keep);
+    foreach($list as $snap)
+    {
+      log::add(__CLASS__,'debug','Delete snapshot: '.print_r($snap['timestamp'],true));
+      $this->deleteSnapshot($snap['timestamp']);
+    }
+  }
+
+  public function cleanSnapshots()
+  {
+    $maxSnapshots = $this->getConfiguration('maxSnapshots',-1);
+    log::add(__CLASS__,'debug','Clean snapshots: keep the last '.$maxSnapshots);
+    $this->cleanOlderSnapshots($maxSnapshots);
   }
 
   public function deleteSnapshot($_timestamp)
@@ -810,8 +841,9 @@ ini_set('display_errors', 'On');
           continue;
         if (preg_match('/(\d+)_(\w+)\.jpg/',$file_path,$matches))
         {
-          if ($_timestamp = 'all' || $matches[1]==$_timestamp)
+          if ($_timestamp == 'all' || $matches[1]==$_timestamp)
           {
+            log::add(__CLASS__,'debug','Deleting snapshot: '.$matches[1]);
             unlink(self::$ROOT_PATH.$this->getSnapPath()."/".$file_path);
           }
         }
