@@ -25,12 +25,12 @@
    var dialog_message = '';
    dialog_message  = '<form class="form-horizontal" onsubmit="return false;">';
    dialog_message += '  <fieldset>';
-   dialog_message += '    <label class="col-lg-4 control-label">{{Nom d\'utilisateur Ring.com (email)}}</label>';
-   dialog_message += '    <div class="col-lg-2">';
+   dialog_message += '    <label class="col-lg-12">{{Nom d\'utilisateur Ring.com (email)}}</label>';
+   dialog_message += '    <div class="col-lg-12">';
    dialog_message += '      <input class="configKey form-control" name="username" />';
    dialog_message += '    </div>';
-   dialog_message += '    <label class="col-lg-4 control-label">{{Mot de passe Ring.com}}</label>';
-   dialog_message += '    <div class="col-lg-2">';
+   dialog_message += '    <label class="col-lg-12">{{Mot de passe Ring.com}}</label>';
+   dialog_message += '    <div class="col-lg-12">';
    dialog_message += '      <input type="password" class="configKey form-control" name="password" />';
    dialog_message += '    </div>';
    dialog_message += '  </fieldset>';
