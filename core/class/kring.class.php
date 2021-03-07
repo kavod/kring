@@ -133,14 +133,19 @@ ini_set('display_errors', 'On');
         try {
           self::$_client->getDevices();
           $return['launchable'] = 'ok';
+        } catch(\KRCPA\Exceptions\krcpaApiException $e)
+        {
+          log::add(__CLASS__, 'debug', 'Lancement démon : '.print_r($e,true));
+          $return['launchable_message'] = __('Echec de l\'authentification',__FILE__);
+          $return['launchable'] = 'nok';
         } catch(\Exception $e)
         {
           log::add(__CLASS__, 'error', 'Lancement démon : '.print_r($e,true));
-          $return['launchable_message'] = __('Echec de l\'authentification',__FILE__);
+          $return['launchable_message'] = __('Erreur inconnue',__FILE__);
           $return['launchable'] = 'nok';
         }
       } else {
-        log::add(__CLASS__, 'error', 'Lancement démon : impossible de trouver le client');
+        log::add(__CLASS__, 'debug', 'Lancement démon : impossible de trouver le client');
       }
 
       return $return;
